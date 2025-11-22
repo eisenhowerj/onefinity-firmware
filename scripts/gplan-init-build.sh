@@ -1,9 +1,9 @@
 #!/bin/bash -ex
 
-IMG_DATE=2017-11-29
-IMG_BASE=${IMG_DATE}-raspbian-stretch-lite
-BASE_URL=https://downloads.raspberrypi.org/raspbian_lite/images
-IMG_URL=$BASE_URL/raspbian_lite-2017-12-01/$IMG_BASE.zip
+IMG_DATE=2024-07-04
+IMG_BASE=${IMG_DATE}-raspios-bookworm-armhf-lite
+BASE_URL=https://downloads.raspberrypi.org/raspios_lite_armhf/images
+IMG_URL=$BASE_URL/raspios_lite_armhf-2024-07-04/$IMG_BASE.img.xz
 GPLAN_IMG=gplan-dev.img
 
 # Create dev image
@@ -11,11 +11,11 @@ if [ ! -e $GPLAN_IMG ]; then
 
     # Get base image
     if [ ! -e $IMG_BASE.img ]; then
-        if [ ! -e $IMG_BASE.zip ]; then
+        if [ ! -e $IMG_BASE.img.xz ]; then
             wget $IMG_URL
         fi
 
-        unzip $IMG_BASE.zip
+        xz -d $IMG_BASE.img.xz
     fi
 
     # Copy base image

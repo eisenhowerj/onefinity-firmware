@@ -9,9 +9,9 @@
 
 # Get the kernel source for the correct kernel version
 
-    wget https://github.com/raspberrypi/linux/archive/raspberrypi-kernel_1.20171029-1.tar.gz
-    tar xf raspberrypi-kernel_1.20171029-1.tar.gz
-    cd linux-raspberrypi-kernel_1.20171029-1
+    wget https://github.com/raspberrypi/linux/archive/refs/tags/stable_20240529.tar.gz
+    tar xf stable_20240529.tar.gz
+    cd linux-stable_20240529
 
 # Prep the kernel source
 

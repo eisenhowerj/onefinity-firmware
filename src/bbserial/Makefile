@@ -3,9 +3,10 @@ DIR:=$(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 obj-m:=bbserial.o
 ccflags-y:=-std=gnu99 -Wno-declaration-after-statement
 
-KPKG=raspberrypi-kernel_1.20171029-1.tar.gz
-KURL=https://github.com/dbrgn/linux-rpi/archive/$(KPKG)
-KDIR=linux-rpi-raspberrypi-kernel_1.20171029-1
+KTAG=stable_20240529
+KPKG=$(KTAG).tar.gz
+KURL=https://github.com/raspberrypi/linux/archive/refs/tags/$(KPKG)
+KDIR=linux-$(KTAG)
 export KERNEL=kernel7
 
 KOPTS=ARCH=arm CROSS_COMPILE=$(CROSS) -C $(KDIR)

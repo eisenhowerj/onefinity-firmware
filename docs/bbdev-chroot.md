@@ -18,8 +18,8 @@ To speed things up you can copy to large downloads, if you already have them,
 into the chroot.
 
     sudo mkdir -p bbdev/opt/bbctrl-firmware/src/bbserial/
-    sudo cp 2017-11-29-raspbian-stretch-lite.zip bbdev/opt/bbctrl-firmware/
-    sudo cp raspberrypi-kernel_1.20171029-1.tar.gz bbdev/opt/bbctrl-firmware/src/bbserial/
+    sudo cp 2024-07-04-raspios-bookworm-armhf-lite.img.xz bbdev/opt/bbctrl-firmware/
+    sudo cp stable_20240529.tar.gz bbdev/opt/bbctrl-firmware/src/bbserial/
 
 # Enter the chroot
 
