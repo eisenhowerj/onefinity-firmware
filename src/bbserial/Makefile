@@ -20,7 +20,7 @@ $(KDIR): $(KPKG)
 	$(MAKE) $(KOPTS) modules_prepare
 
 $(KPKG):
-	wget --progress none $(KURL)
+	wget $(KURL)
 
 clean:
 	$(MAKE) $(KOPTS) M=$(DIR) clean
