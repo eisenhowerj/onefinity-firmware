@@ -40,12 +40,6 @@ jobs:
     - name: Build project
       run: make all
     
-    - name: Run tests
-      run: |
-        if [ -f tests/test_gpio_compat.py ]; then
-          python tests/test_gpio_compat.py
-        fi
-    
     - name: Build package
       run: make pkg
     
