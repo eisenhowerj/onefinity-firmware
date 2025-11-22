@@ -588,7 +588,7 @@ static int _probe(struct amba_device *dev, const struct amba_id *id) {
   }
 
   // Register device class
-  _port.class = class_create(THIS_MODULE, "bbs");
+  _port.class = class_create("bbs");
   if (IS_ERR(_port.class)) {
     unregister_chrdev(_port.major, DEVICE_NAME);
     clk_disable_unprepare(_port.clk);
@@ -610,7 +610,7 @@ static int _probe(struct amba_device *dev, const struct amba_id *id) {
 }
 
 
-static int _remove(struct amba_device *dev) {
+static void _remove(struct amba_device *dev) {
   if (debug) printk(KERN_INFO "bbserial: removing\n");
 
   unsigned long flags;
@@ -637,8 +637,6 @@ static int _remove(struct amba_device *dev) {
   class_unregister(_port.class);
   class_destroy(_port.class);
   unregister_chrdev(_port.major, DEVICE_NAME);
-
-  return 0;
 }
 
 
