@@ -98,7 +98,10 @@ data = list(read_intel_hex(open(sys.argv[1], 'r')))
 sp = serial.Serial(dev, baud, timeout = 10)
 
 # Reset AVR
-import RPi.GPIO as gpio
+try:
+    from bbctrl import gpio_compat as gpio
+except ImportError:
+    import RPi.GPIO as gpio
 gpio.setwarnings(False)
 gpio.setmode(gpio.BCM)
 gpio.setup(27, gpio.OUT)

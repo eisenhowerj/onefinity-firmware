@@ -1,6 +1,14 @@
 OneFinity CNC Controller Firmware Changelog
 ===========================================
 
+## v1.6.8 (Unreleased)
+ - Added Raspberry Pi 5 support
+ - Created GPIO compatibility layer for Pi 3 and Pi 5 (src/py/bbctrl/gpio_compat.py)
+ - Updated setup script to detect Pi model and install appropriate GPIO libraries
+ - Pi 5 uses python3-lgpio and libgpiod-tools instead of python3-rpi.gpio and wiringpi
+ - Updated boot configuration paths for Pi 5 (/boot/firmware instead of /boot)
+ - See docs/raspberry_pi_5_support.md for detailed information
+
 ## v1.0.8
  - Fixed chatter and lost steps issues (most commonly seen by Fusion users), re-enabled support for G61, G61.1, G64.
  - Fixed 3d preview on Safari-based web browsers (MacOS & iOS)
