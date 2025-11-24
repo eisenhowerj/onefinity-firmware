@@ -18,6 +18,7 @@ $(KDIR): $(KPKG)
 	tar xf $(KPKG)
 	$(MAKE) $(KOPTS) bcm2709_defconfig
 	$(MAKE) $(KOPTS) modules_prepare
+	touch $(KDIR)/Module.symvers
 
 $(KPKG):
 	wget -q  $(KURL)
