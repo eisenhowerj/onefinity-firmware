@@ -13,8 +13,8 @@ jobs:
     
     steps:
     - uses: actions/checkout@v4
-      with:
-        repository: onefinitycnc/onefinity-firmware
+      # with:
+      #   repository: onefinitycnc/onefinity-firmware
     
     - name: Set up Node.js
       uses: actions/setup-node@v4
