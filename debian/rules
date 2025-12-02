@@ -1,0 +1,62 @@
+#!/usr/bin/make -f
+# debian/rules for onefinity-firmware
+
+%:
+	dh $@ --with python3
+
+override_dh_auto_clean:
+	# Clean build artifacts
+	rm -rf build dist node_modules src/svelte-components/node_modules
+	rm -rf src/svelte-components/dist
+	find . -type f -name '*.pyc' -delete
+	find . -type d -name '__pycache__' -delete
+	dh_auto_clean
+
+override_dh_auto_build:
+	# Build frontend components
+	npm install
+	cd src/svelte-components && npm install && npm run build
+	
+	# Build AVR firmware
+	$(MAKE) -C src/avr
+	
+	# Build other subprojects
+	$(MAKE) -C src/boot
+	$(MAKE) -C src/pwr
+	$(MAKE) -C src/jig
+	
+	# Build Python package
+	python3 setup.py build
+
+override_dh_auto_install:
+	# Install Python package
+	python3 setup.py install --root=$(CURDIR)/debian/onefinity-firmware --install-layout=deb
+	
+	# Install HTTP frontend
+	mkdir -p $(CURDIR)/debian/onefinity-firmware/opt/onefinity/http
+	cp -r build/http/* $(CURDIR)/debian/onefinity-firmware/opt/onefinity/http/
+	
+	# Install AVR firmware
+	mkdir -p $(CURDIR)/debian/onefinity-firmware/opt/onefinity/firmware
+	cp src/avr/bbctrl-avr-firmware.hex $(CURDIR)/debian/onefinity-firmware/opt/onefinity/firmware/
+	
+	# Install system scripts
+	mkdir -p $(CURDIR)/debian/onefinity-firmware/opt/onefinity/bin
+	install -m 755 scripts/update-bbctrl $(CURDIR)/debian/onefinity-firmware/opt/onefinity/bin/
+	install -m 755 scripts/upgrade-bbctrl $(CURDIR)/debian/onefinity-firmware/opt/onefinity/bin/
+	install -m 755 scripts/config-wifi $(CURDIR)/debian/onefinity-firmware/opt/onefinity/bin/
+	install -m 755 scripts/config-screen $(CURDIR)/debian/onefinity-firmware/opt/onefinity/bin/
+	install -m 755 scripts/browser $(CURDIR)/debian/onefinity-firmware/opt/onefinity/bin/
+	install -m 755 scripts/avr109-flash.py $(CURDIR)/debian/onefinity-firmware/opt/onefinity/bin/
+	
+	# Install systemd service
+	mkdir -p $(CURDIR)/debian/onefinity-firmware/etc/systemd/system
+	install -m 644 scripts/bbctrl.service $(CURDIR)/debian/onefinity-firmware/etc/systemd/system/onefinity.service
+	
+	# Create directories for runtime
+	mkdir -p $(CURDIR)/debian/onefinity-firmware/var/log/onefinity
+	mkdir -p $(CURDIR)/debian/onefinity-firmware/var/lib/onefinity
+
+override_dh_auto_test:
+	# Skip tests for now
+	@echo "Skipping tests"

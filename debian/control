@@ -1,0 +1,40 @@
+Source: onefinity-firmware
+Section: misc
+Priority: optional
+Maintainer: OneFinity CNC <info@onefinitycnc.com>
+Build-Depends: debhelper (>= 12),
+               nodejs (>= 18),
+               npm,
+               python3,
+               python3-setuptools,
+               gcc-avr,
+               avr-libc,
+               make,
+               build-essential
+Standards-Version: 4.5.0
+Homepage: https://onefinitycnc.com/
+Vcs-Browser: https://github.com/eisenhowerj/onefinity-firmware
+Vcs-Git: https://github.com/eisenhowerj/onefinity-firmware.git
+
+Package: onefinity-firmware
+Architecture: arm64
+Depends: ${shlibs:Depends},
+         ${misc:Depends},
+         python3 (>= 3.9),
+         python3-tornado,
+         python3-sockjs-tornado,
+         python3-serial,
+         python3-pyudev,
+         python3-smbus2,
+         python3-watchdog,
+         systemd,
+         avrdude
+Recommends: python3-lgpio | python3-rpi.gpio
+Description: OneFinity CNC Controller Firmware
+ Complete firmware package for OneFinity CNC controllers including:
+  - Web-based control interface (HTTP frontend)
+  - Python-based machine control backend
+  - AVR firmware for hardware communication
+  - System configuration and management scripts
+ .
+ Supports Raspberry Pi 3 Model B and Raspberry Pi 5.

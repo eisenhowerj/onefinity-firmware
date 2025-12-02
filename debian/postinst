@@ -1,0 +1,41 @@
+#!/bin/bash
+set -e
+
+# Post-installation script for onefinity-firmware
+
+case "$1" in
+    configure)
+        # Reload systemd daemon
+        systemctl daemon-reload
+        
+        # Enable but don't start the service (user should configure first)
+        systemctl enable onefinity.service || true
+        
+        # Set permissions
+        chown -R root:root /opt/onefinity
+        chmod -R 755 /opt/onefinity/bin
+        
+        # Create log directory with proper permissions
+        mkdir -p /var/log/onefinity
+        chmod 755 /var/log/onefinity
+        
+        # Create state directory
+        mkdir -p /var/lib/onefinity
+        chmod 755 /var/lib/onefinity
+        
+        echo "OneFinity firmware installed successfully."
+        echo "To start the service, run: sudo systemctl start onefinity"
+        ;;
+    
+    abort-upgrade|abort-remove|abort-deconfigure)
+        ;;
+    
+    *)
+        echo "postinst called with unknown argument \`$1'" >&2
+        exit 1
+        ;;
+esac
+
+#DEBHELPER#
+
+exit 0

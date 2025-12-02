@@ -9,7 +9,7 @@ on:
 
 jobs:
   build:
-    runs-on: [ self-hosted, ec2 ]
+    runs-on: [self-hosted, linux, arm64]
     
     steps:
     - uses: actions/checkout@v4

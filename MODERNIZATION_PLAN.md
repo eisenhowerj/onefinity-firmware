@@ -215,11 +215,42 @@ jobs:
   build:
     runs-on: [self-hosted, linux, arm64]
     steps:
-      - Checkout code
-      - Install dependencies
-      - Build all components
-      - Create .deb package
-      - Upload artifact
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential gcc-avr avr-libc \
+            python3 python3-setuptools debhelper devscripts
+      
+      - name: Build frontend
+        run: |
+          npm install
+          cd src/svelte-components && npm install && npm run build
+      
+      - name: Build AVR firmware
+        run: |
+          cd src/avr && make
+      
+      - name: Build Python backend
+        run: |
+          python3 setup.py build
+      
+      - name: Create Debian package
+        run: |
+          dpkg-buildpackage -us -uc -b
+      
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: debian-package
+          path: ../*.deb
 ```
 
 #### build-rpi-image.yml (NEW)
