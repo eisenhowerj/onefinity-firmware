@@ -17,7 +17,7 @@ on:
 
 jobs:
   build-rpi-image:
-    runs-on: [self-hosted, linux, arm64]
+    runs-on: [self-hosted, linux, arm64, ec2]
     permissions:
       contents: write  # Needed for uploading to releases
     strategy:

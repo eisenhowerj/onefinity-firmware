@@ -9,7 +9,7 @@ on:
 
 jobs:
   build-debian-package:
-    runs-on: [self-hosted, linux, arm64]
+    runs-on: [self-hosted, linux, arm64, ec2]
     permissions:
       contents: read
     
