@@ -214,15 +214,21 @@ connection, wired or wireless.
 
 ### SSH Access to OneFinity Controller
 
-You can SSH into the OneFinity Controller:
+You can SSH into the OneFinity Controller. The hostname depends on the installation method:
+- **SD Card Image**: `onefinity.local` (hostname set during image build)
+- **Manual Setup**: May still be `raspberrypi.local` or custom hostname
 
 ```bash
-ssh bbmc@onefinity.local
+# For SD card image installations
+ssh pi@onefinity.local
+
+# For legacy Buildbotics installations
+ssh bbmc@bbctrl.local
 ```
 
-Default credentials:
-- Username: `bbmc` or `pi`
-- Password: `buildbotics` or `onefinity`
+Default credentials (varies by installation method):
+- Username: `pi` or `bbmc`
+- Password: `onefinity` or `buildbotics`
 
 **Important**: Change the default password after first login!
 

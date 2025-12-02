@@ -102,8 +102,14 @@ sudo chroot "${MOUNT_DIR}/root" /bin/bash -c "
 # Configure boot settings
 echo "Configuring boot settings..."
 if [ "$RPI_MODEL" = "pi5" ]; then
-    # Pi 5 boot config
-    sudo bash -c "cat >> ${MOUNT_DIR}/boot/firmware/config.txt" << 'EOF'
+    # Pi 5 boot config (uses /boot/firmware in newer OS versions)
+    BOOT_CONFIG="${MOUNT_DIR}/boot/firmware/config.txt"
+    if [ ! -f "$BOOT_CONFIG" ]; then
+        # Fallback to /boot/config.txt if firmware subdirectory doesn't exist
+        BOOT_CONFIG="${MOUNT_DIR}/boot/config.txt"
+    fi
+    
+    sudo bash -c "cat >> ${BOOT_CONFIG}" << 'EOF'
 
 # OneFinity CNC Controller Settings
 dtparam=i2c_arm=on
@@ -115,8 +121,10 @@ disable_splash=1
 dtoverlay=disable-bt
 EOF
 else
-    # Pi 3 boot config
-    sudo bash -c "cat >> ${MOUNT_DIR}/boot/config.txt" << 'EOF'
+    # Pi 3 boot config (uses /boot/config.txt)
+    BOOT_CONFIG="${MOUNT_DIR}/boot/config.txt"
+    
+    sudo bash -c "cat >> ${BOOT_CONFIG}" << 'EOF'
 
 # OneFinity CNC Controller Settings
 dtparam=i2c_arm=on

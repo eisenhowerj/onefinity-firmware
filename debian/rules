@@ -15,7 +15,8 @@ override_dh_auto_clean:
 override_dh_auto_build:
 	# Build frontend components
 	npm install
-	cd src/svelte-components && npm install && npm run build
+	cd src/svelte-components && npm install
+	cd src/svelte-components && npm run build
 	
 	# Build AVR firmware
 	$(MAKE) -C src/avr
