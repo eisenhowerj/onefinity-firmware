@@ -18,6 +18,8 @@ on:
 jobs:
   build-rpi-image:
     runs-on: [self-hosted, linux, arm64]
+    permissions:
+      contents: write  # Needed for uploading to releases
     strategy:
       matrix:
         rpi_model: [pi3, pi5]
