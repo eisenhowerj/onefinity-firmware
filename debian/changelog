@@ -1,0 +1,10 @@
+onefinity-firmware (1.6.7) bookworm; urgency=medium
+
+  * Initial Debian package release
+  * Modernized project structure with Debian packaging
+  * Support for Raspberry Pi 3 Model B and Raspberry Pi 5
+  * Web-based control interface
+  * Python machine control backend
+  * AVR firmware integration
+
+ -- OneFinity CNC <info@onefinitycnc.com>  Mon, 02 Dec 2024 06:47:00 +0000

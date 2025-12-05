@@ -1,0 +1,82 @@
+name: Build Debian Package
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master, develop]
+  workflow_dispatch:
+
+jobs:
+  build-debian-package:
+    runs-on: [self-hosted, ec2]
+    permissions:
+      contents: read
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      
+      - name: Get version
+        id: version
+        run: |
+          VERSION=$(sed -n 's/^.*"version": "\([^"]*\)",.*$/\1/p' package.json)
+          echo "version=${VERSION}" >> $GITHUB_OUTPUT
+          echo "pkg_name=onefinity-firmware_${VERSION}_arm64" >> $GITHUB_OUTPUT
+      
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential gcc-avr avr-libc \
+            python3 python3-setuptools python3-pip \
+            debhelper devscripts dh-python
+      
+      - name: Install Python dependencies
+        run: |
+          # Try to install via apt first, fallback to pip if needed
+          sudo apt-get install -y \
+            python3-tornado \
+            python3-serial \
+            python3-pyudev \
+            python3-smbus2 || true
+          # Install remaining packages via pip in user mode
+          pip3 install --user tornado sockjs-tornado pyserial pyudev smbus2 watchdog
+      
+      - name: Install Node dependencies
+        run: |
+          npm install
+      
+      - name: Build Debian package
+        run: |
+          dpkg-buildpackage -us -uc -b -d
+      
+      - name: List and move built packages
+        run: |
+          ls -lh ../*.deb || echo "No .deb files found"
+          mkdir -p artifacts
+          mv ../*.deb artifacts/ || true
+          mv ../*.build artifacts/ || true
+          mv ../*.buildinfo artifacts/ || true
+          ls -lh artifacts/
+      
+      - name: Upload Debian package
+        uses: actions/upload-artifact@v4
+        with:
+          name: debian-package
+          path: artifacts/*.deb
+          retention-days: 7
+      
+      - name: Upload build log (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-log
+          path: |
+            artifacts/*.build
+            artifacts/*.buildinfo
+          retention-days: 7

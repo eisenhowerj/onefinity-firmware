@@ -8,7 +8,7 @@ on:
 
 jobs:
   build-and-release:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, linux, arm64, ec2]
     permissions:
       contents: write
     
@@ -51,6 +51,12 @@ jobs:
     - name: Build package
       run: make pkg
     
+    - name: Build Debian package
+      run: |
+        sudo apt-get install -y debhelper devscripts dh-python
+        dpkg-buildpackage -us -uc -b -d
+        mv ../*.deb dist/ || true
+    
     - name: Generate changelog
       id: changelog
       run: |
@@ -67,6 +73,7 @@ jobs:
       with:
         files: |
           dist/${{ steps.version.outputs.pkg_name }}.tar.bz2
+          dist/*.deb
         body: |
           ## Release ${{ steps.version.outputs.version }}
           

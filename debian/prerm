@@ -1,0 +1,24 @@
+#!/bin/bash
+set -e
+
+# Pre-removal script for onefinity-firmware
+
+case "$1" in
+    remove|upgrade|deconfigure)
+        # Stop the service if it's running
+        systemctl stop onefinity.service || true
+        systemctl disable onefinity.service || true
+        ;;
+    
+    failed-upgrade)
+        ;;
+    
+    *)
+        echo "prerm called with unknown argument \`$1'" >&2
+        exit 1
+        ;;
+esac
+
+#DEBHELPER#
+
+exit 0
