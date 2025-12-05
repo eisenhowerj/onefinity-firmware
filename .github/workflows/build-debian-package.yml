@@ -55,15 +55,20 @@ jobs:
         run: |
           dpkg-buildpackage -us -uc -b -d
       
-      - name: List built packages
+      - name: List and move built packages
         run: |
           ls -lh ../*.deb || echo "No .deb files found"
+          mkdir -p artifacts
+          mv ../*.deb artifacts/ || true
+          mv ../*.build artifacts/ || true
+          mv ../*.buildinfo artifacts/ || true
+          ls -lh artifacts/
       
       - name: Upload Debian package
         uses: actions/upload-artifact@v4
         with:
           name: debian-package
-          path: ../*.deb
+          path: artifacts/*.deb
           retention-days: 7
       
       - name: Upload build log (on failure)
@@ -72,6 +77,6 @@ jobs:
         with:
           name: build-log
           path: |
-            ../*.build
-            ../*.buildinfo
+            artifacts/*.build
+            artifacts/*.buildinfo
           retention-days: 7
