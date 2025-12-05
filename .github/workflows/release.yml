@@ -54,7 +54,7 @@ jobs:
     - name: Build Debian package
       run: |
         sudo apt-get install -y debhelper devscripts dh-python
-        dpkg-buildpackage -us -uc -b
+        dpkg-buildpackage -us -uc -b -d
         mv ../*.deb dist/ || true
     
     - name: Generate changelog

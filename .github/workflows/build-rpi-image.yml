@@ -64,7 +64,7 @@ jobs:
       
       - name: Build Debian package
         run: |
-          dpkg-buildpackage -us -uc -b
+          dpkg-buildpackage -us -uc -b -d
           ls -lh ../*.deb
       
       - name: Build RPi Image for ${{ matrix.rpi_model }}

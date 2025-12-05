@@ -53,7 +53,7 @@ jobs:
       
       - name: Build Debian package
         run: |
-          dpkg-buildpackage -us -uc -b
+          dpkg-buildpackage -us -uc -b -d
       
       - name: List built packages
         run: |
