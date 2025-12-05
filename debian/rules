@@ -1,9 +1,10 @@
 #!/usr/bin/make -f
 # debian/rules for onefinity-firmware
 
-# Disable hardening flags that AVR toolchain doesn't support
+# Disable hardening flags that AVR toolchain doesn't support or that fail with legacy code
 # AVR toolchain (avr-g++) is older and doesn't support some modern GCC features
-export DEB_BUILD_MAINT_OPTIONS = hardening=-stackprotector reproducible=-fixfilepath
+# format-security disabled due to legacy printf usage in AVR code
+export DEB_BUILD_MAINT_OPTIONS = hardening=-stackprotector,-format reproducible=-fixfilepath
 
 %:
 	dh $@ --with python3
