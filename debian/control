@@ -7,10 +7,14 @@ Build-Depends: debhelper (>= 12),
                npm,
                python3,
                python3-setuptools,
+               python3-dev,
                gcc-avr,
                avr-libc,
                make,
-               build-essential
+               build-essential,
+               scons,
+               libssl-dev,
+               git
 Standards-Version: 4.5.0
 Homepage: https://onefinitycnc.com/
 Vcs-Browser: https://github.com/eisenhowerj/onefinity-firmware
