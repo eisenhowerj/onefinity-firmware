@@ -15,9 +15,10 @@ CBANG_DIR="${WORK_DIR}/cbang"
 CAMOTICS_DIR="${WORK_DIR}/camotics"
 TARGET_DIR="${PROJECT_ROOT}/src/py/camotics"
 
-# Git commits for dependencies
-CBANG_COMMIT="18f1e963107ef26abe750c023355a5c40dd07853"
-CAMOTICS_COMMIT="ec876c80d20fc19837133087cef0c447df5a939d"
+# Git commits for dependencies (pinned to known working versions)
+# These commits are the same as used in scripts/gplan-init-build.sh
+CBANG_COMMIT="18f1e963107ef26abe750c023355a5c40dd07853"    # cbang base library
+CAMOTICS_COMMIT="ec876c80d20fc19837133087cef0c447df5a939d"  # camotics gplan module
 
 echo "Building gplan module natively..."
 echo "Work directory: ${WORK_DIR}"
@@ -67,15 +68,12 @@ touch "${CAMOTICS_ROOT}/build/version.txt"
 # Apply patches to prevent maxVel/maxJerk/maxAccel overflow issues
 echo "Applying patches..."
 if [ -f "${CAMOTICS_PLAN}/LineCommand.cpp" ]; then
-    perl -i -0pe 's/(fabs\((config\.maxVel\[axis\]) \/ unit\[axis\]\));/std::min(\2, \1);/gm' \
-        "${CAMOTICS_PLAN}/LineCommand.cpp" \
-        "${CAMOTICS_PLAN}/LinePlanner.cpp" 2>/dev/null || true
-    perl -i -0pe 's/(fabs\((config\.maxJerk\[axis\]) \/ unit\[axis\]\));/std::min(\2, \1);/gm' \
-        "${CAMOTICS_PLAN}/LineCommand.cpp" \
-        "${CAMOTICS_PLAN}/LinePlanner.cpp" 2>/dev/null || true
-    perl -i -0pe 's/(fabs\((config\.maxAccel\[axis\]) \/ unit\[axis\]\));/std::min(\2, \1);/gm' \
-        "${CAMOTICS_PLAN}/LineCommand.cpp" \
-        "${CAMOTICS_PLAN}/LinePlanner.cpp" 2>/dev/null || true
+    # Apply all three substitutions in a single perl command to reduce duplication
+    perl -i -0pe '
+        s/(fabs\((config\.maxVel\[axis\]) \/ unit\[axis\]\));/std::min(\2, \1);/gm;
+        s/(fabs\((config\.maxJerk\[axis\]) \/ unit\[axis\]\));/std::min(\2, \1);/gm;
+        s/(fabs\((config\.maxAccel\[axis\]) \/ unit\[axis\]\));/std::min(\2, \1);/gm;
+    ' "${CAMOTICS_PLAN}/LineCommand.cpp" "${CAMOTICS_PLAN}/LinePlanner.cpp" 2>/dev/null || true
 fi
 
 # Build gplan module
