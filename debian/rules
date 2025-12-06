@@ -24,6 +24,12 @@ override_dh_auto_build:
 	cd src/svelte-components && npm install
 	$(MAKE) all
 	
+	# Build gplan module (only on ARM, skip on other architectures)
+	# This requires scons, build-essential, libssl-dev, python3-dev
+	if [ -x scripts/gplan-build-native.sh ]; then \
+		./scripts/gplan-build-native.sh || echo "Warning: gplan build failed, continuing without it"; \
+	fi
+	
 	# Build Python package
 	python3 setup.py build
 
