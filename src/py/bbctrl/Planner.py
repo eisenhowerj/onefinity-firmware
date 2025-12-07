@@ -30,7 +30,12 @@ import math
 import re
 import time
 from collections import deque
-import camotics.gplan as gplan # pylint: disable=no-name-in-module,import-error
+
+try:
+    import camotics.gplan as gplan # pylint: disable=no-name-in-module,import-error
+except ImportError:
+    gplan = None  # gplan.so not available, planner will not work
+
 import bbctrl.Cmd as Cmd
 from bbctrl.CommandQueue import CommandQueue
 
@@ -69,14 +74,15 @@ class Planner():
 
 
     def is_busy(self): return self.is_running() or self.cmdq.is_active()
-    def is_running(self): return self.planner.is_running()
+    def is_running(self): return self.planner is not None and self.planner.is_running()
     def position_change(self): self._position_dirty = True
 
 
     def _sync_position(self, force = False):
         if not force and not self._position_dirty: return
         self._position_dirty = False
-        self.planner.set_position(self.ctrl.state.get_position())
+        if self.planner is not None:
+            self.planner.set_position(self.ctrl.state.get_position())
 
 
     def get_config(self, mdi, with_limits):
@@ -138,7 +144,8 @@ class Planner():
     def _update(self, update):
         if 'id' in update:
             id = update['id']
-            self.planner.set_active(id) # Release planner commands
+            if self.planner is not None:
+                self.planner.set_active(id) # Release planner commands
             self.cmdq.release(id)       # Synchronize planner variables
 
 
@@ -281,7 +288,8 @@ class Planner():
 
         if type == 'input':
             # TODO handle timeout
-            self.planner.synchronize(0) # TODO Fix this
+            if self.planner is not None:
+                self.planner.synchronize(0) # TODO Fix this
             return Cmd.input(block['port'], block['mode'], block['timeout'])
 
         if type == 'output':
@@ -329,11 +337,16 @@ class Planner():
         if stop:
             self.ctrl.mach.stop()
 
-        self.planner = gplan.Planner()
-        self.planner.set_resolver(self._get_var_cb)
-        # TODO logger is global and will not work correctly in demo mode
-        self.planner.set_logger(self._log_cb, 1, 'LinePlanner:3')
-        self._position_dirty = True
+        if gplan is None:
+            self.log.warning('gplan module not available - planner disabled')
+            self.planner = None
+        else:
+            self.planner = gplan.Planner()
+            self.planner.set_resolver(self._get_var_cb)
+            # TODO logger is global and will not work correctly in demo mode
+            self.planner.set_logger(self._log_cb, 1, 'LinePlanner:3')
+            self._position_dirty = True
+        
         self.cmdq.clear()
         self.reset_times()
 
@@ -343,6 +356,9 @@ class Planner():
 
 
     def mdi(self, cmd, with_limits = True):
+        if self.planner is None:
+            self.log.error('MDI command failed: gplan module not available')
+            return
         self.where = '<mdi>'
         self.log.info('MDI:' + cmd)
         self._sync_position()
@@ -351,6 +367,9 @@ class Planner():
 
 
     def load(self, path):
+        if self.planner is None:
+            self.log.error('Load failed: gplan module not available')
+            return
         self.where = path
         path = self.ctrl.get_path('upload', path)
         self.log.info('GCode:' + path)
@@ -361,7 +380,8 @@ class Planner():
 
     def stop(self):
         try:
-            self.planner.stop()
+            if self.planner is not None:
+                self.planner.stop()
             self.cmdq.clear()
 
         except:
@@ -371,6 +391,10 @@ class Planner():
 
     def restart(self):
         try:
+            if self.planner is None:
+                self.log.error('Restart failed: gplan module not available')
+                return
+
             id = self.ctrl.state.get('id')
             position = self.ctrl.state.get_position()
 
@@ -388,6 +412,9 @@ class Planner():
 
     def next(self):
         try:
+            if self.planner is None:
+                return None
+            
             while self.planner.has_more():
                 cmd = self.planner.next()
                 cmd = self._encode(cmd)

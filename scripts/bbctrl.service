@@ -4,7 +4,7 @@ After=network.target
 
 [Service]
 User=root
-ExecStart=/usr/local/bin/bbctrl -l /var/log/bbctrl.log
+ExecStart=/usr/bin/bbctrl -l /var/log/bbctrl.log
 WorkingDirectory=/var/lib/bbctrl
 Restart=always
 StandardOutput=null
