@@ -76,7 +76,7 @@ touch /boot/firmware/ssh
 
 # Fix boot - Update paths for Pi 5
 sed -i 's/ root=[^ ]* / root=\/dev\/mmcblk0p2/' $BOOT_CMDLINE
-sed -i 's/^PARTUUID=.*\/boot/\/dev\/mmcblk0p1 \/boot/' /etc/fstab
+sed -i 's/^PARTUUID=.*\/boot/\/dev\/mmcblk0p1 \/boot\/firmware/' /etc/fstab
 sed -i 's/^PARTUUID=.*\//\/dev\/mmcblk0p2 \//' /etc/fstab
 
 # Enable browser in xorg
