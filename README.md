@@ -6,10 +6,9 @@ OneFinity CNC Controller Firmware is a complete software solution for controllin
 
 ## Supported Hardware
 
-- **Raspberry Pi 3 Model B** (32-bit armhf)
-- **Raspberry Pi 5** (64-bit arm64)
+- **Raspberry Pi 5** (64-bit ARM64)
 
-For detailed information about Raspberry Pi 5 support, see [docs/raspberry_pi_5_support.md](docs/raspberry_pi_5_support.md).
+**Note:** Raspberry Pi 3 support has been removed in favor of focusing on the more capable Pi 5 hardware.
 
 ## Installation
 
@@ -17,9 +16,8 @@ For detailed information about Raspberry Pi 5 support, see [docs/raspberry_pi_5_
 
 The easiest way to get started is to flash a pre-built SD card image:
 
-1. Download the appropriate image for your hardware:
-   - [Pi 3 Image](https://github.com/eisenhowerj/onefinity-firmware/releases) - `onefinity-*-rpi3-armhf.img.xz`
-   - [Pi 5 Image](https://github.com/eisenhowerj/onefinity-firmware/releases) - `onefinity-*-rpi5-arm64.img.xz`
+1. Download the Pi 5 image from [releases](https://github.com/eisenhowerj/onefinity-firmware/releases):
+   - `onefinity-*-rpi5-arm64.img.xz`
 
 2. Flash to SD card using [Raspberry Pi Imager](https://www.raspberrypi.com/software/)
 
@@ -29,7 +27,7 @@ See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed flashing instructions.
 
 ### Advanced: Debian Package
 
-For existing Raspberry Pi systems, install via Debian package:
+For existing Raspberry Pi 5 systems, install via Debian package:
 
 ```bash
 # Download the latest package
@@ -50,7 +48,6 @@ See [DEPLOYMENT.md](DEPLOYMENT.md) for complete deployment documentation.
 - **[DEPLOYMENT.md](DEPLOYMENT.md)** - Installation and deployment guide
 - **[MODERNIZATION_PLAN.md](MODERNIZATION_PLAN.md)** - Project structure and architecture
 - **[docs/development.md](docs/development.md)** - Development setup and build instructions
-- **[docs/raspberry_pi_5_support.md](docs/raspberry_pi_5_support.md)** - Raspberry Pi 5 specific information
 
 ## Development
 
@@ -108,8 +105,8 @@ ls ../*.deb
 ```bash
 # Build Debian package first (see above)
 
-# Build image
-.github/workflows/scripts/build-rpi-image.sh <version> <path-to-deb> <pi3|pi5>
+# Build image for Pi 5
+.github/workflows/scripts/build-rpi-image.sh <version> <path-to-deb> pi5
 ```
 
 ## CI/CD
@@ -118,7 +115,7 @@ This project uses GitHub Actions with self-hosted ARM64 runners for native build
 
 - **Build & Test**: Runs on every push and PR
 - **Debian Package**: Built automatically
-- **RPi Images**: Built for both Pi 3 and Pi 5
+- **RPi Images**: Built for Raspberry Pi 5
 - **Releases**: Automated releases on version tags
 
 See [MODERNIZATION_PLAN.md](MODERNIZATION_PLAN.md) for CI/CD architecture details.

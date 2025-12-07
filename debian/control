@@ -35,7 +35,7 @@ Depends: ${shlibs:Depends},
          python3-watchdog,
          systemd,
          avrdude
-Recommends: python3-lgpio | python3-rpi.gpio
+Recommends: python3-lgpio
 Description: OneFinity CNC Controller Firmware
  Complete firmware package for OneFinity CNC controllers including:
   - Web-based control interface (HTTP frontend)
@@ -43,4 +43,4 @@ Description: OneFinity CNC Controller Firmware
   - AVR firmware for hardware communication
   - System configuration and management scripts
  .
- Supports Raspberry Pi 3 Model B and Raspberry Pi 5.
+ Supports Raspberry Pi 5 (ARM64) only.

@@ -2,15 +2,6 @@ name: Build RPi SD Card Image
 
 on:
   workflow_dispatch:
-    inputs:
-      rpi_model:
-        description: 'Raspberry Pi Model'
-        required: true
-        default: 'pi3'
-        type: choice
-        options:
-          - pi3
-          - pi5
   push:
     tags:
       - 'v*'
@@ -20,9 +11,6 @@ jobs:
     runs-on: [self-hosted, linux, arm64, ec2]
     permissions:
       contents: write  # Needed for uploading to releases
-    strategy:
-      matrix:
-        rpi_model: [pi3, pi5]
     
     steps:
       - name: Checkout code
@@ -67,18 +55,18 @@ jobs:
           dpkg-buildpackage -us -uc -b -d
           ls -lh ../*.deb
       
-      - name: Build RPi Image for ${{ matrix.rpi_model }}
+      - name: Build RPi Image for Pi 5
         run: |
           DEB_FILE=$(ls ../*.deb | head -1)
           .github/workflows/scripts/build-rpi-image.sh \
             ${{ steps.version.outputs.version }} \
             "${DEB_FILE}" \
-            ${{ matrix.rpi_model }}
+            pi5
       
       - name: Upload RPi Image
         uses: actions/upload-artifact@v4
         with:
-          name: rpi-image-${{ matrix.rpi_model }}
+          name: rpi-image-pi5
           path: dist/*.img.xz
           retention-days: 30
       

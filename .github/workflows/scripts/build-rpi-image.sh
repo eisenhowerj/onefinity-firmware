@@ -2,18 +2,23 @@
 set -e
 
 # Build RPi SD card image with OneFinity firmware pre-installed
-# Usage: build-rpi-image.sh <version> <deb-file> <rpi-model>
+# Usage: build-rpi-image.sh <version> <deb-file> [rpi-model]
 
 VERSION=${1:-"1.6.7"}
 DEB_FILE=${2:-""}
-RPI_MODEL=${3:-"pi3"}  # pi3 or pi5
+RPI_MODEL=${3:-"pi5"}  # pi5 only (Pi 3 support removed)
 
 if [ -z "$DEB_FILE" ] || [ ! -f "$DEB_FILE" ]; then
     echo "Error: Debian package file not found: $DEB_FILE"
     exit 1
 fi
 
-echo "Building OneFinity RPi ${RPI_MODEL} image version ${VERSION}"
+if [ "$RPI_MODEL" != "pi5" ]; then
+    echo "Error: Only Raspberry Pi 5 (pi5) is supported. Pi 3 support has been removed."
+    exit 1
+fi
+
+echo "Building OneFinity RPi 5 image version ${VERSION}"
 echo "Using Debian package: ${DEB_FILE}"
 
 # Configuration
@@ -21,18 +26,10 @@ WORK_DIR="$(pwd)/rpi-image-build"
 MOUNT_DIR="${WORK_DIR}/mnt"
 OUTPUT_DIR="$(pwd)/dist"
 
-# RPi OS image URLs
-if [ "$RPI_MODEL" = "pi5" ]; then
-    # Pi 5 requires 64-bit OS
-    BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2024-07-04/2024-07-04-raspios-bookworm-arm64-lite.img.xz"
-    BASE_IMAGE_NAME="raspios-bookworm-arm64-lite.img"
-    OUTPUT_IMAGE="onefinity-${VERSION}-rpi5-arm64.img"
-else
-    # Pi 3 uses 32-bit OS
-    BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2024-07-04/2024-07-04-raspios-bookworm-armhf-lite.img.xz"
-    BASE_IMAGE_NAME="raspios-bookworm-armhf-lite.img"
-    OUTPUT_IMAGE="onefinity-${VERSION}-rpi3-armhf.img"
-fi
+# RPi OS image URLs - Pi 5 requires 64-bit OS
+BASE_IMAGE_URL="https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2024-07-04/2024-07-04-raspios-bookworm-arm64-lite.img.xz"
+BASE_IMAGE_NAME="raspios-bookworm-arm64-lite.img"
+OUTPUT_IMAGE="onefinity-${VERSION}-rpi5-arm64.img"
 
 # Cleanup previous builds
 echo "Cleaning up previous builds..."
@@ -101,15 +98,14 @@ sudo chroot "${MOUNT_DIR}/root" /bin/bash -c "
 
 # Configure boot settings
 echo "Configuring boot settings..."
-if [ "$RPI_MODEL" = "pi5" ]; then
-    # Pi 5 boot config (uses /boot/firmware in newer OS versions)
-    BOOT_CONFIG="${MOUNT_DIR}/boot/firmware/config.txt"
-    if [ ! -f "$BOOT_CONFIG" ]; then
-        # Fallback to /boot/config.txt if firmware subdirectory doesn't exist
-        BOOT_CONFIG="${MOUNT_DIR}/boot/config.txt"
-    fi
-    
-    sudo bash -c "cat >> ${BOOT_CONFIG}" << 'EOF'
+# Pi 5 boot config (uses /boot/firmware in newer OS versions)
+BOOT_CONFIG="${MOUNT_DIR}/boot/firmware/config.txt"
+if [ ! -f "$BOOT_CONFIG" ]; then
+    # Fallback to /boot/config.txt if firmware subdirectory doesn't exist
+    BOOT_CONFIG="${MOUNT_DIR}/boot/config.txt"
+fi
+
+sudo bash -c "cat >> ${BOOT_CONFIG}" << 'EOF'
 
 # OneFinity CNC Controller Settings
 dtparam=i2c_arm=on
@@ -120,23 +116,6 @@ disable_splash=1
 # Disable Bluetooth
 dtoverlay=disable-bt
 EOF
-else
-    # Pi 3 boot config (uses /boot/config.txt)
-    BOOT_CONFIG="${MOUNT_DIR}/boot/config.txt"
-    
-    sudo bash -c "cat >> ${BOOT_CONFIG}" << 'EOF'
-
-# OneFinity CNC Controller Settings
-dtparam=i2c_arm=on
-dtparam=spi=on
-max_usb_current=1
-config_hdmi_boost=8
-disable_splash=1
-
-# Disable Bluetooth
-dtoverlay=pi3-disable-bt
-EOF
-fi
 
 # Cleanup and unmount
 echo "Cleaning up..."
