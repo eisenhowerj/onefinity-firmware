@@ -10,6 +10,14 @@ case "$1" in
             useradd -r -s /usr/sbin/nologin -d /var/lib/onefinity -c "OneFinity CNC Service" onefinity
         fi
         
+        # Install Python packages not available in Debian repositories
+        # sockjs-tornado is no longer available as a system package in Debian 12+
+        echo "Installing Python dependencies via pip..."
+        pip3 install --break-system-packages sockjs-tornado || {
+            echo "Warning: Failed to install sockjs-tornado via pip"
+            exit 1
+        }
+        
         # Reload systemd daemon
         systemctl daemon-reload
         
