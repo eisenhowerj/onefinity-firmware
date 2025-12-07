@@ -12,9 +12,11 @@ case "$1" in
         
         # Install Python packages not available in Debian repositories
         # sockjs-tornado is no longer available as a system package in Debian 12+
+        # --break-system-packages is required for Python 3.11+ in Debian 12+ to allow
+        # pip to install packages system-wide (this is a system service package)
         echo "Installing Python dependencies via pip..."
         pip3 install --break-system-packages sockjs-tornado || {
-            echo "Warning: Failed to install sockjs-tornado via pip"
+            echo "Error: Failed to install sockjs-tornado via pip"
             exit 1
         }
         
