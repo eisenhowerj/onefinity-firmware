@@ -346,7 +346,7 @@ class Planner():
             # TODO logger is global and will not work correctly in demo mode
             self.planner.set_logger(self._log_cb, 1, 'LinePlanner:3')
             self._position_dirty = True
-        
+
         self.cmdq.clear()
         self.reset_times()
 
@@ -414,7 +414,7 @@ class Planner():
         try:
             if self.planner is None:
                 return None
-            
+
             while self.planner.has_more():
                 cmd = self.planner.next()
                 cmd = self._encode(cmd)
