@@ -9,13 +9,32 @@ on:
 
 jobs:
   build-debian-package:
-    runs-on: [self-hosted, ec2, arm64, debian11 ]
+    runs-on: [self-hosted, ec2, arm64, debian12 ]
     permissions:
       contents: read
     
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      
+      - name: Display system versions
+        run: |
+          echo "=== System Version Information ==="
+          echo "Debian version:"
+          cat /etc/debian_version || echo "Not available"
+          echo ""
+          echo "OS Release:"
+          cat /etc/os-release | grep -E "PRETTY_NAME|VERSION" || echo "Not available"
+          echo ""
+          echo "Python version:"
+          python3 --version
+          echo ""
+          echo "Node version:"
+          node --version || echo "Node not yet installed"
+          echo ""
+          echo "NPM version:"
+          npm --version || echo "NPM not yet installed"
+          echo "=================================="
       
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -34,7 +53,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential debhelper devscripts \
             dh-python scons libssl-dev \
-            avrdude avr-libc gcc-9 gcc-arm-linux-gnueabihf gcc-avr 
+            avrdude avr-libc gcc-arm-linux-gnueabihf gcc-avr 
 
       
       - name: Install Python dependencies
@@ -47,8 +66,8 @@ jobs:
             python3-setuptools \
             python3-pyudev \
             python3-smbus2 || true
-          # Install remaining packages via pip in user mode
-          pip3 install --user tornado sockjs-tornado pyserial pyudev smbus2 watchdog
+          # Install remaining packages via pip (--break-system-packages needed for Debian 12/Python 3.11+)
+          pip3 install --user --break-system-packages tornado sockjs-tornado pyserial pyudev smbus2 watchdog
       
       - name: Install Node dependencies
         run: |

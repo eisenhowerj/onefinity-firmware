@@ -24,7 +24,7 @@ Package: onefinity-firmware
 Architecture: arm64
 Depends: ${shlibs:Depends},
          ${misc:Depends},
-         python3 (>= 3.9),
+         python3 (>= 3.11),
          python3-tornado,
          python3-sockjs-tornado,
          python3-serial,
