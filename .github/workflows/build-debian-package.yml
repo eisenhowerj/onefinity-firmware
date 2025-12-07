@@ -17,6 +17,25 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
       
+      - name: Display system versions
+        run: |
+          echo "=== System Version Information ==="
+          echo "Debian version:"
+          cat /etc/debian_version || echo "Not available"
+          echo ""
+          echo "OS Release:"
+          cat /etc/os-release | grep -E "PRETTY_NAME|VERSION" || echo "Not available"
+          echo ""
+          echo "Python version:"
+          python3 --version
+          echo ""
+          echo "Node version:"
+          node --version || echo "Node not yet installed"
+          echo ""
+          echo "NPM version:"
+          npm --version || echo "NPM not yet installed"
+          echo "=================================="
+      
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
