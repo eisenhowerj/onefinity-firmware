@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 
-"""GPIO compatibility layer for Raspberry Pi 3 and 5"""
+"""GPIO compatibility layer for Raspberry Pi
+Primary target: Raspberry Pi 5 with lgpio
+Maintains backward compatibility with RPi.GPIO as fallback
+"""
 
 import sys
 
@@ -21,7 +24,9 @@ if not USING_LGPIO and not USING_RPI_GPIO:
 
 
 class GPIOCompat:
-    """Unified GPIO interface for RPi 3 and RPi 5"""
+    """Unified GPIO interface for Raspberry Pi
+    Primarily targets Pi 5 with lgpio, falls back to RPi.GPIO if needed
+    """
     
     BCM = 'BCM'
     OUT = 'OUT'
