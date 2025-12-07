@@ -54,8 +54,9 @@ update-rc.d bbctrl defaults
 echo -e "\ndtoverlay=disable-bt" >> $BOOT_CONFIG
 rm -f /etc/systemd/system/multi-user.target.wants/hciuart.service
 
-# Install hawkeye
-dpkg -i hawkeye_0.6_armhf.deb
+# Install hawkeye (Note: Requires ARM64 version for Pi 5)
+# TODO: Update to hawkeye_0.6_arm64.deb when available
+dpkg -i hawkeye_0.6_armhf.deb || echo "Warning: hawkeye package not found or incompatible"
 sed -i 's/localhost/0.0.0.0/' /etc/hawkeye/hawkeye.conf
 echo 'ACTION=="add", KERNEL=="video0", RUN+="/usr/sbin/service hawkeye restart"' > /etc/udev/rules.d/50-hawkeye.rules
 adduser hawkeye video

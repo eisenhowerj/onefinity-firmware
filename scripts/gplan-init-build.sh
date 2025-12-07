@@ -1,9 +1,9 @@
 #!/bin/bash -ex
 
 IMG_DATE=2024-07-04
-IMG_BASE=${IMG_DATE}-raspios-bookworm-armhf-lite
-BASE_URL=https://downloads.raspberrypi.org/raspios_lite_armhf/images
-IMG_URL=$BASE_URL/raspios_lite_armhf-2024-07-04/$IMG_BASE.img.xz
+IMG_BASE=${IMG_DATE}-raspios-bookworm-arm64-lite
+BASE_URL=https://downloads.raspberrypi.org/raspios_lite_arm64/images
+IMG_URL=$BASE_URL/raspios_lite_arm64-2024-07-04/$IMG_BASE.img.xz
 GPLAN_IMG=gplan-dev.img
 
 # Create dev image

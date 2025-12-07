@@ -153,7 +153,7 @@ git push origin main
 
 Workflows available:
 - `build-debian-package.yml` - Builds .deb package
-- `build-rpi-image.yml` - Builds SD card images for Pi 3 and Pi 5
+- `build-rpi-image.yml` - Builds SD card images for Raspberry Pi 5
 - `release.yml` - Creates releases with all artifacts
 
 ## Upload the Firmware Package to a Buildbotics CNC Controller
@@ -185,11 +185,11 @@ This will set the fuses, install the bootloader and program the firmware.
 
 ## Installing the RaspberryPi base system
 
-Download the latest Raspberry Pi OS Lite image and decompress it:
+Download the latest Raspberry Pi OS Lite ARM64 image and decompress it:
 
     wget \
-      https://downloads.raspberrypi.org/raspios_lite_armhf/images/raspios_lite_armhf-2024-07-04/2024-07-04-raspios-bookworm-armhf-lite.img.xz
-    xz -d 2024-07-04-raspios-bookworm-armhf-lite.img.xz
+      https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2024-07-04/2024-07-04-raspios-bookworm-arm64-lite.img.xz
+    xz -d 2024-07-04-raspios-bookworm-arm64-lite.img.xz
 
 Now copy the base system to an SD card.  You need a card with at least 8GiB.
 After installing the RPi system all data on the SD card will be lost.  So make
@@ -202,7 +202,7 @@ inserting the card look for log messages containing ``/dev/sdx`` where ``x`` is
 a letter.  This should be the device name of the SD card.  Hit ``CTRL-C`` to
 stop following the system log.
 
-    sudo dd bs=4M if=2024-07-04-raspios-bookworm-armhf-lite.img of=/dev/sde
+    sudo dd bs=4M if=2024-07-04-raspios-bookworm-arm64-lite.img of=/dev/sde
     sudo sync
 
 The first command takes awhile and does not produce any output until it's done.
@@ -338,7 +338,7 @@ This provides:
 
 - **build-test.yml**: Runs on every push/PR, builds and tests
 - **build-debian-package.yml**: Builds Debian package
-- **build-rpi-image.yml**: Builds SD card images for Pi 3 and Pi 5
+- **build-rpi-image.yml**: Builds SD card images for Raspberry Pi 5
 - **release.yml**: Creates GitHub releases with all artifacts
 - **tag.yml**: Creates version tags
 
@@ -433,7 +433,7 @@ Use AVR simulator or hardware debugger (requires external tools).
 
 - Check service status: `systemctl status onefinity`
 - Review logs: `journalctl -u onefinity`
-- Verify GPIO libraries installed (lgpio for Pi 5, RPi.GPIO for Pi 3)
+- Verify GPIO library installed: `python3-lgpio`
 
 ## Contributing
 
