@@ -34,8 +34,8 @@ Depends: ${shlibs:Depends},
          python3-smbus2,
          python3-watchdog,
          systemd,
-         avrdude
-Recommends: python3-lgpio
+         avrdude,
+         python3-lgpio
 Description: OneFinity CNC Controller Firmware
  Complete firmware package for OneFinity CNC controllers including:
   - Web-based control interface (HTTP frontend)
