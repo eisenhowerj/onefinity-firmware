@@ -1,30 +1,23 @@
 #!/usr/bin/env python3
+"""
+Minimal setup.py wrapper for backward compatibility.
+
+Modern Python packaging is now defined in pyproject.toml.
+This file exists only for additional configuration not supported in pyproject.toml,
+specifically the scripts that need to be installed.
+
+For new installations, use:
+    pip install .
+or:
+    python -m build
+"""
 
 from setuptools import setup
-import json
 
-pkg = json.load(open('package.json', 'r'))
-
-
+# All configuration is in pyproject.toml except for scripts
+# Scripts are listed here because setuptools doesn't support them in pyproject.toml
 setup(
-    name = pkg['name'],
-    version = pkg['version'],
-    description = 'Buildbotics Machine Controller',
-    long_description = open('README.md', 'rt').read(),
-    author = 'Joseph Coffland',
-    author_email = 'joseph@buildbotics.org',
-    platforms = ['any'],
-    license = pkg['license'],
-    url = pkg['homepage'],
-    package_dir = {'': 'src/py'},
-    packages = ['bbctrl', 'inevent', 'lcd', 'camotics','iw_parse'],
-    include_package_data = True,
-    entry_points = {
-        'console_scripts': [
-            'bbctrl = bbctrl:run'
-            ]
-        },
-    scripts = [
+    scripts=[
         'scripts/update-bbctrl',
         'scripts/upgrade-bbctrl',
         'scripts/sethostname',
@@ -34,7 +27,5 @@ setup(
         'scripts/edit-config',
         'scripts/edit-boot-config',
         'scripts/browser',
-        ],
-    install_requires = 'tornado sockjs-tornado pyserial pyudev smbus2 watchdog'.split(),
-    zip_safe = False,
-    )
+    ],
+)

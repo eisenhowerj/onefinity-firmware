@@ -1,0 +1,9 @@
+# Production dependencies for OneFinity CNC Controller
+# These are the runtime dependencies required for the application to function
+
+tornado>=6.4,<7.0
+sockjs-tornado>=1.0.7,<2.0
+pyserial>=3.5,<4.0
+pyudev>=0.24,<0.25
+smbus2>=0.5,<0.6
+watchdog>=2.0,<5.0
