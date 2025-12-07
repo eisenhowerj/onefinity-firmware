@@ -54,12 +54,13 @@ update-rc.d bbctrl defaults
 echo -e "\ndtoverlay=disable-bt" >> $BOOT_CONFIG
 rm -f /etc/systemd/system/multi-user.target.wants/hciuart.service
 
-# Install hawkeye (Note: Requires ARM64 version for Pi 5)
-# TODO: Update to hawkeye_0.6_arm64.deb when available
-dpkg -i hawkeye_0.6_armhf.deb || echo "Warning: hawkeye package not found or incompatible"
-sed -i 's/localhost/0.0.0.0/' /etc/hawkeye/hawkeye.conf
-echo 'ACTION=="add", KERNEL=="video0", RUN+="/usr/sbin/service hawkeye restart"' > /etc/udev/rules.d/50-hawkeye.rules
-adduser hawkeye video
+# Install hawkeye - Disabled until ARM64 version is available
+# The current hawkeye_0.6_armhf.deb is incompatible with ARM64 (Pi 5)
+# TODO: Re-enable when hawkeye_0.6_arm64.deb is available
+# dpkg -i hawkeye_0.6_arm64.deb
+# sed -i 's/localhost/0.0.0.0/' /etc/hawkeye/hawkeye.conf
+# echo 'ACTION=="add", KERNEL=="video0", RUN+="/usr/sbin/service hawkeye restart"' > /etc/udev/rules.d/50-hawkeye.rules
+# adduser hawkeye video
 
 # Disable HDMI to save power and remount /boot read-only
 sed -i 's/^exit 0$//' /etc/rc.local
@@ -71,10 +72,10 @@ echo "gpioset gpiochip4 27=alt3 2>/dev/null || true" >> /etc/rc.local
 echo -e "\n# Dynamic clock\nnohz=on" >> $BOOT_CONFIG
 
 # Enable ssh
-touch /boot/ssh
+touch /boot/firmware/ssh
 
-# Fix boot
-sed -i 's/ root=[^ ]* / root=\/dev\/mmcblk0p2/' /boot/cmdline.txt
+# Fix boot - Update paths for Pi 5
+sed -i 's/ root=[^ ]* / root=\/dev\/mmcblk0p2/' $BOOT_CMDLINE
 sed -i 's/^PARTUUID=.*\/boot/\/dev\/mmcblk0p1 \/boot/' /etc/fstab
 sed -i 's/^PARTUUID=.*\//\/dev\/mmcblk0p2 \//' /etc/fstab
 
