@@ -66,8 +66,8 @@ jobs:
             python3-setuptools \
             python3-pyudev \
             python3-smbus2 || true
-          # Install remaining packages via pip in user mode
-          pip3 install --user tornado sockjs-tornado pyserial pyudev smbus2 watchdog
+          # Install remaining packages via pip (--break-system-packages needed for Debian 12/Python 3.11+)
+          pip3 install --user --break-system-packages tornado sockjs-tornado pyserial pyudev smbus2 watchdog
       
       - name: Install Node dependencies
         run: |
