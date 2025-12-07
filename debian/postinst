@@ -11,12 +11,21 @@ case "$1" in
         fi
         
         # Install Python packages not available or too old in Debian repositories
-        # - sockjs-tornado is no longer available as a system package in Debian 12+
-        # - tornado in Debian 12 is 6.2, but we need >=6.4 for compatibility
+        # Many Python packages in Debian 12 are older than required:
+        # - sockjs-tornado: not available in Debian 12+
+        # - tornado: Debian has 6.2, we need >=6.4
+        # - smbus2: Debian has 0.4.2, we need >=0.5
+        # - pyserial, pyudev, watchdog: May have version mismatches
         # --break-system-packages is required for Python 3.11+ in Debian 12+ to allow
         # pip to install packages system-wide (this is a system service package)
         echo "Installing Python dependencies via pip..."
-        pip3 install --break-system-packages 'tornado>=6.4,<7.0' 'sockjs-tornado>=1.0.7,<2.0' || {
+        pip3 install --break-system-packages \
+            'tornado>=6.4,<7.0' \
+            'sockjs-tornado>=1.0.7,<2.0' \
+            'pyserial>=3.5,<4.0' \
+            'pyudev>=0.24,<0.25' \
+            'smbus2>=0.5,<0.6' \
+            'watchdog>=2.0,<5.0' || {
             echo "Error: Failed to install Python dependencies via pip"
             exit 1
         }
