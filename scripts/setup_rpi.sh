@@ -56,8 +56,8 @@ rm -f /etc/systemd/system/multi-user.target.wants/hciuart.service
 
 # Install hawkeye - Disabled until ARM64 version is available
 # The current hawkeye_0.6_armhf.deb is incompatible with ARM64 (Pi 5)
-# TODO: Re-enable when hawkeye_0.6_arm64.deb is available
-# dpkg -i hawkeye_0.6_arm64.deb
+# TODO: Re-enable when ARM64 version is available
+# dpkg -i hawkeye_*_arm64.deb
 # sed -i 's/localhost/0.0.0.0/' /etc/hawkeye/hawkeye.conf
 # echo 'ACTION=="add", KERNEL=="video0", RUN+="/usr/sbin/service hawkeye restart"' > /etc/udev/rules.d/50-hawkeye.rules
 # adduser hawkeye video
@@ -71,7 +71,7 @@ echo "gpioset gpiochip4 27=alt3 2>/dev/null || true" >> /etc/rc.local
 # Dynamic clock to save power
 echo -e "\n# Dynamic clock\nnohz=on" >> $BOOT_CONFIG
 
-# Enable ssh
+# Enable SSH
 touch /boot/firmware/ssh
 
 # Fix boot - Update paths for Pi 5
