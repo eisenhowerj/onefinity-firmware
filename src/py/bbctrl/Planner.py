@@ -413,6 +413,7 @@ class Planner():
     def next(self):
         try:
             if self.planner is None:
+                self.log.warning('Next command failed: gplan module not available')
                 return None
 
             while self.planner.has_more():
