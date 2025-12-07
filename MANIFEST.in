@@ -1,4 +1,4 @@
-include package.json README.md
+include package.json README.md pyproject.toml requirements.txt requirements-dev.txt
 graft scripts
 graft src/py/bbctrl/http
 graft src/py/camotics
