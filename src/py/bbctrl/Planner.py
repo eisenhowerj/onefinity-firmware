@@ -345,8 +345,8 @@ class Planner():
             self.planner.set_resolver(self._get_var_cb)
             # TODO logger is global and will not work correctly in demo mode
             self.planner.set_logger(self._log_cb, 1, 'LinePlanner:3')
-            self._position_dirty = True
 
+        self._position_dirty = True
         self.cmdq.clear()
         self.reset_times()
 
