@@ -339,7 +339,7 @@ jobs:
 
 ### Debian Package Dependencies (debian/control)
 ```
-Depends: python3 (>= 3.9),
+Depends: python3 (>= 3.11),
          python3-tornado,
          python3-sockjs-tornado,
          python3-serial,
