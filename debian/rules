@@ -31,7 +31,8 @@ override_dh_auto_build:
 	fi
 	
 	# Build Python package using modern build system
-	python3 -m build --wheel --no-isolation
+	# In Debian, python3-build provides the pyproject-build command
+	pyproject-build --wheel --no-isolation
 
 override_dh_auto_install:
 	# Install Python package using pip (modern method, avoids pkg_resources entry point issues)
