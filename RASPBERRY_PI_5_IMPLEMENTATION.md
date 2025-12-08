@@ -1,7 +1,9 @@
 # Raspberry Pi 5 Implementation Summary
 
+> **Note**: As of v1.6.9, Raspberry Pi 3 support has been removed. This firmware now exclusively supports Raspberry Pi 5 (ARM64).
+
 ## Overview
-This document summarizes the changes made to add Raspberry Pi 5 support to the OneFinity CNC Controller Firmware.
+This document summarizes the historical changes made to add Raspberry Pi 5 support to the OneFinity CNC Controller Firmware. The compatibility layer described here is still in use, though it now primarily targets Pi 5 with lgpio.
 
 ## Problem
 The firmware was originally built for Raspberry Pi 3 Model B, which uses the `RPi.GPIO` Python library for GPIO control. Raspberry Pi 5 has a different GPIO architecture and requires the `lgpio` library instead.

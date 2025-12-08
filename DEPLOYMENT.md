@@ -9,7 +9,7 @@ OneFinity firmware can be deployed in two ways:
 ## Debian Package Deployment
 
 ### Prerequisites
-- Raspberry Pi 3 Model B or Raspberry Pi 5
+- Raspberry Pi 5
 - Raspberry Pi OS Bookworm (or compatible Debian-based system)
 - Network connectivity (for downloading dependencies)
 
@@ -115,15 +115,14 @@ sudo apt purge onefinity-firmware
 ## SD Card Image Deployment
 
 ### Prerequisites
-- Raspberry Pi 3 Model B or Raspberry Pi 5
+- Raspberry Pi 5
 - MicroSD card (8GB minimum, 16GB+ recommended)
 - SD card reader
 - Computer for flashing the image
 
 ### Available Images
 
-Two image variants are available:
-- **Pi 3 (armhf)**: `onefinity-X.X.X-rpi3-armhf.img.xz` - For Raspberry Pi 3 Model B
+SD card image for Raspberry Pi 5:
 - **Pi 5 (arm64)**: `onefinity-X.X.X-rpi5-arm64.img.xz` - For Raspberry Pi 5
 
 ### Flashing the Image
@@ -133,7 +132,7 @@ Two image variants are available:
 1. **Download the Image**
    
    ```bash
-   wget https://github.com/eisenhowerj/onefinity-firmware/releases/download/vX.X.X/onefinity-X.X.X-rpiX-armXX.img.xz
+   wget https://github.com/eisenhowerj/onefinity-firmware/releases/download/vX.X.X/onefinity-X.X.X-rpi5-arm64.img.xz
    ```
 
 2. **Identify the SD Card Device**
@@ -150,7 +149,7 @@ Two image variants are available:
 3. **Flash the Image**
    
    ```bash
-   xz -d -c onefinity-X.X.X-rpiX-armXX.img.xz | sudo dd of=/dev/sdX bs=4M status=progress conv=fsync
+   xz -d -c onefinity-X.X.X-rpi5-arm64.img.xz | sudo dd of=/dev/sdX bs=4M status=progress conv=fsync
    ```
    
    Replace `/dev/sdX` with your SD card device.
@@ -168,7 +167,7 @@ Two image variants are available:
    
    Download from the releases page or use curl:
    ```bash
-   curl -L -o onefinity.img.xz https://github.com/eisenhowerj/onefinity-firmware/releases/download/vX.X.X/onefinity-X.X.X-rpiX-armXX.img.xz
+   curl -L -o onefinity.img.xz https://github.com/eisenhowerj/onefinity-firmware/releases/download/vX.X.X/onefinity-X.X.X-rpi5-arm64.img.xz
    ```
 
 2. **Identify the SD Card**
@@ -426,18 +425,11 @@ Reflash the AVR firmware:
 sudo /opt/onefinity/bin/avr109-flash.py /opt/onefinity/firmware/bbctrl-avr-firmware.hex
 ```
 
-### GPIO Issues on Pi 5
+### GPIO Issues
 
 Ensure lgpio is installed:
 ```bash
 sudo apt install python3-lgpio libgpiod-tools
-```
-
-### GPIO Issues on Pi 3
-
-Ensure RPi.GPIO is installed:
-```bash
-sudo apt install python3-rpi.gpio wiringpi
 ```
 
 ## Support

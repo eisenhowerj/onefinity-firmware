@@ -2,14 +2,9 @@
 
 ## Overview
 
-This firmware now supports both Raspberry Pi 3 Model B and Raspberry Pi 5. The main difference between these models is the GPIO handling.
+This firmware supports Raspberry Pi 5 exclusively. Raspberry Pi 3 support has been removed to simplify the codebase and focus on the more capable Pi 5 hardware.
 
-## GPIO Changes
-
-### Raspberry Pi 3
-- Uses `RPi.GPIO` Python library
-- Package: `python3-rpi.gpio`
-- Traditional GPIO interface
+## GPIO Implementation
 
 ### Raspberry Pi 5
 - Uses `lgpio` Python library
@@ -18,11 +13,11 @@ This firmware now supports both Raspberry Pi 3 Model B and Raspberry Pi 5. The m
 
 ## GPIO Compatibility Layer
 
-A compatibility layer has been implemented in `src/py/bbctrl/gpio_compat.py` that automatically detects which GPIO library is available and provides a unified interface. This allows the same code to work on both Pi 3 and Pi 5.
+A compatibility layer is implemented in `src/py/bbctrl/gpio_compat.py` that provides a unified GPIO interface. While it still supports fallback to RPi.GPIO for backward compatibility with existing code, the primary target is now lgpio for Raspberry Pi 5.
 
 ### Usage
 
-Scripts can import the compatibility layer instead of RPi.GPIO directly:
+Scripts import the compatibility layer for GPIO operations:
 
 ```python
 from bbctrl import gpio_compat as gpio
@@ -33,20 +28,11 @@ gpio.setup(27, gpio.OUT)
 gpio.output(27, 1)
 ```
 
-The compatibility layer will automatically use:
-- `lgpio` on Raspberry Pi 5 (if available)
-- `RPi.GPIO` on Raspberry Pi 3 (fallback)
-
-## Setup Script
-
-The `scripts/setup_rpi.sh` script now detects the Raspberry Pi model and installs the appropriate GPIO library:
-
-- **Pi 5**: Installs `python3-lgpio` (wiringpi is not needed as it doesn't support Pi 5)
-- **Pi 3**: Installs `python3-rpi.gpio` and `wiringpi`
+The compatibility layer uses `lgpio` on Raspberry Pi 5.
 
 ## Building Firmware
 
-No changes are needed to the build process. The firmware package will work on both Pi 3 and Pi 5:
+Build the firmware package for ARM64:
 
 ```bash
 make pkg
@@ -54,17 +40,16 @@ make pkg
 
 ## Installing on Raspberry Pi 5
 
-When running `setup_rpi.sh` on a Raspberry Pi 5, the script will automatically:
-1. Detect the Pi 5 model
-2. Install `python3-lgpio` instead of `python3-rpi.gpio`
-3. Skip installing `wiringpi` (not compatible with Pi 5)
+The setup script installs the required GPIO library:
+1. Installs `python3-lgpio` for Pi 5 GPIO support
+2. Configures GPIO settings for optimal CNC controller operation
 
-## Modified Files
+## Key Implementation Files
 
-- `src/py/bbctrl/gpio_compat.py` - New GPIO compatibility layer
-- `scripts/avr109-flash.py` - Updated to use compatibility layer
-- `scripts/setup_rpi.sh` - Updated to detect Pi model and install appropriate packages
-- `docs/raspberry_pi_5_support.md` - This documentation
+- `src/py/bbctrl/gpio_compat.py` - GPIO compatibility layer
+- `scripts/avr109-flash.py` - AVR flashing utility using GPIO
+- `scripts/setup_rpi.sh` - System setup script
+- `debian/control` - Package dependencies including python3-lgpio
 
 ## Testing
 
@@ -74,7 +59,9 @@ To test on Raspberry Pi 5:
 3. Run setup script
 4. Verify GPIO operations work correctly
 
-## Limitations
+## Hardware Requirements
 
-- The firmware has been updated to work with both models, but thorough testing on Pi 5 hardware is recommended
-- Some hardware-specific features may behave differently on Pi 5 due to architectural changes
+- **Required**: Raspberry Pi 5 (ARM64)
+- **OS**: Raspberry Pi OS Bookworm (Debian 12) or later
+- **Python**: 3.11+
+- **GPIO Library**: python3-lgpio

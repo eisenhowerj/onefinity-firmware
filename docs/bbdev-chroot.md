@@ -18,7 +18,7 @@ To speed things up you can copy to large downloads, if you already have them,
 into the chroot.
 
     sudo mkdir -p bbdev/opt/bbctrl-firmware/src/bbserial/
-    sudo cp 2024-07-04-raspios-bookworm-armhf-lite.img.xz bbdev/opt/bbctrl-firmware/
+    sudo cp 2024-07-04-raspios-bookworm-arm64-lite.img.xz bbdev/opt/bbctrl-firmware/
     sudo cp stable_20240529.tar.gz bbdev/opt/bbctrl-firmware/src/bbserial/
 
 # Enter the chroot
