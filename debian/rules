@@ -7,7 +7,7 @@
 export DEB_BUILD_MAINT_OPTIONS = hardening=-stackprotector,-format reproducible=-fixfilepath
 
 %:
-	dh $@ --with python3
+	dh $@
 
 override_dh_auto_clean:
 	# Clean build artifacts
@@ -36,7 +36,8 @@ override_dh_auto_build:
 override_dh_auto_install:
 	# Install Python package using pip (avoids pkg_resources entry point issues)
 	# This method generates proper entry points compatible with pip-installed dependencies
-	pip3 install --root=$(CURDIR)/debian/onefinity-firmware --no-deps --ignore-installed dist/*.whl
+	# Use --prefix=/usr to install to /usr/bin instead of /usr/local/bin
+	pip3 install --root=$(CURDIR)/debian/onefinity-firmware --prefix=/usr --no-deps --ignore-installed dist/*.whl
 	
 	# Install HTTP frontend
 	mkdir -p $(CURDIR)/debian/onefinity-firmware/opt/onefinity/http
