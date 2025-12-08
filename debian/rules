@@ -30,12 +30,12 @@ override_dh_auto_build:
 		./scripts/gplan-build-native.sh || echo "Warning: gplan build failed, continuing without it"; \
 	fi
 	
-	# Build Python package
-	python3 setup.py build
+	# Build Python package using modern build system
+	python3 -m build --wheel --no-isolation
 
 override_dh_auto_install:
-	# Install Python package
-	python3 setup.py install --root=$(CURDIR)/debian/onefinity-firmware --install-layout=deb
+	# Install Python package using pip (modern method, avoids pkg_resources entry point issues)
+	pip3 install --root=$(CURDIR)/debian/onefinity-firmware --no-deps --ignore-installed dist/*.whl
 	
 	# Install HTTP frontend
 	mkdir -p $(CURDIR)/debian/onefinity-firmware/opt/onefinity/http
