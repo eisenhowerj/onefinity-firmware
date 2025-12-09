@@ -12,9 +12,7 @@ RESOURCES  := $(patsubst src/resources/%,$(TARGET_DIR)/%,$(RESOURCES))
 TEMPLS     := $(wildcard src/pug/templates/*.pug)
 
 AVR_FIRMWARE := src/avr/bbctrl-avr-firmware.hex
-GPLAN_MOD    := rpi-share/camotics/gplan.so
 GPLAN_TARGET := src/py/camotics/gplan.so
-GPLAN_IMG    := gplan-dev.img
 
 RSYNC_EXCLUDE := \*.pyc __pycache__ \*.egg-info \\\#* \*~ .\\\#\*
 RSYNC_EXCLUDE := $(patsubst %,--exclude %,$(RSYNC_EXCLUDE))
@@ -44,17 +42,8 @@ bbserial:
 
 gplan: $(GPLAN_TARGET)
 
-$(GPLAN_TARGET): $(GPLAN_MOD)
-	cp $< $@
-
-$(GPLAN_MOD): $(GPLAN_IMG)
-	./scripts/gplan-init-build.sh
-	cp ./scripts/gplan-build.sh rpi-share/
-	chmod +x rpi-share/gplan-build.sh
-	sudo ./scripts/rpi-chroot.sh $(GPLAN_IMG) /mnt/host/gplan-build.sh
-
-$(GPLAN_IMG):
-	./scripts/gplan-init-build.sh
+$(GPLAN_TARGET):
+	./scripts/gplan-build-native.sh
 
 .PHONY: $(AVR_FIRMWARE)
 $(AVR_FIRMWARE):
