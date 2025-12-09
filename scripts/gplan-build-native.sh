@@ -16,7 +16,6 @@ CAMOTICS_DIR="${WORK_DIR}/camotics"
 TARGET_DIR="${PROJECT_ROOT}/src/py/camotics"
 
 # Git commits for dependencies (pinned to known working versions)
-# These commits are the same as used in scripts/gplan-init-build.sh
 CBANG_COMMIT="18f1e963107ef26abe750c023355a5c40dd07853"    # cbang base library
 CAMOTICS_COMMIT="ec876c80d20fc19837133087cef0c447df5a939d"  # camotics gplan module
 
