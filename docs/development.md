@@ -60,8 +60,20 @@ sudo apt-get install -y \
     wget \
     xz-utils \
     parted \
-    kpartx \
-    qemu-user-static
+    kpartx
+```
+
+### For Building GPlan Module (ARM64 System)
+
+If you want to build the gplan module locally:
+
+```bash
+sudo apt-get install -y \
+    scons \
+    build-essential \
+    libssl-dev \
+    python3-dev \
+    git
 ```
 
 ## Getting the Source Code
@@ -104,16 +116,36 @@ python3 setup.py build
 
 ## Build GPlan Module
 
-GPlan is a Python module written in C++.  It must be compiled for ARM so that
-it can be used on the Raspberry Pi.  This is accomplished using a chroot, qemu
-and binfmt to create an emulated ARM build environment.  This is faster and
-more convenient than building on the RPi itself.  All of this is automated.
+GPlan is a Python module written in C++. It must be compiled for ARM64 so that
+it can be used on the Raspberry Pi 5.
+
+### On ARM64 Systems (Native Build)
+
+The recommended approach is to build natively on an ARM64 system (such as the
+Raspberry Pi 5 or ARM64 development machine):
 
     make gplan
 
-The first time this is run it will take quite awhile as it setups up the build
-environment.  You can run the above command again later to build the latest
-version.
+Or use the build script directly:
+
+    ./scripts/gplan-build-native.sh
+
+This will:
+- Clone the required dependencies (cbang and camotics)
+- Build the gplan.so module natively
+- Install it to `src/py/camotics/gplan.so`
+
+The first time this is run, it will take some time as it downloads and compiles
+the dependencies. Subsequent builds will be faster as they reuse the cached builds.
+
+### On x86_64 Systems (Cross-compilation)
+
+For x86_64 systems, cross-compilation is not currently supported in the native
+build script. The recommended approach is to use CI/CD (GitHub Actions) which
+runs on ARM64 runners, or build directly on an ARM64 machine.
+
+**Note**: The legacy QEMU/chroot emulation approach has been deprecated and
+removed. See `docs/emu_chroot.md` for historical reference only.
 
 ## Build Packages
 

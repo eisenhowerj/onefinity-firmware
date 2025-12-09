@@ -1,4 +1,14 @@
-This document describes how to setup the Buildbotics firmware in a chroot
+**DEPRECATED**: This document is obsolete and kept for historical reference only.
+
+The OneFinity firmware now builds natively on ARM64 systems and no longer
+requires QEMU emulation or chroot environments for development or CI/CD.
+See `docs/development.md` for current build instructions.
+
+---
+
+**Historical Documentation:**
+
+This document described how to setup the Buildbotics firmware in a chroot
 environment for the purposes of demonstrating the user interface.
 
 On a Debian system install:
