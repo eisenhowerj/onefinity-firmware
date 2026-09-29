@@ -92,4 +92,7 @@ clean:
 	rm -rf rpi-share
 	git clean -fxd
 
+lint:
+	npm run lint
+
 .PHONY: all install clean tidy pkg gplan lint pylint jshint bbserial
