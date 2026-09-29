@@ -186,7 +186,7 @@
                     style="width: 70px;"
                 />
 
-                <span style="display: inline-block; width: 20px;" />
+                <span style="display: inline-block; width: 20px;"></span>
 
                 <TextField
                     bind:value={hour}
@@ -225,17 +225,18 @@
                     scrollToIndex={currentTimezoneIndex}
                     scrollToAlignment="center"
                 >
-                    <div
-                        slot="item"
-                        let:index
-                        let:style
-                        {style}
-                        class="timezone"
-                        class:selected={index === selectedTimezoneIndex}
-                        on:click={() => (selectedTimezoneIndex = index)}
-                    >
-                        {timezones[index].label}
-                    </div>
+                    {#snippet item({ index, style })}
+                        <button
+                            type="button"
+                            {style}
+                            class="timezone"
+                            class:selected={index === selectedTimezoneIndex}
+                            aria-pressed={index === selectedTimezoneIndex}
+                            onclick={() => (selectedTimezoneIndex = index)}
+                        >
+                            {timezones[index].label}
+                        </button>
+                    {/snippet}
                 </VirtualList>
             </div>
         {/if}
@@ -249,7 +250,7 @@
             tag="button"
             defaultAction
             disabled={selectedTimezoneIndex === -1}
-            on:click={onConfirm}
+            onclick={onConfirm}
         >
             <Label>Confirm</Label>
         </Button>
@@ -275,11 +276,17 @@
             }
         }
         .timezone {
+            width: 100%;
             font-size: 14px;
+            font-family: inherit;
             display: flex;
             align-items: center;
             margin: 0;
-            padding-left: 10px;
+            padding: 0 0 0 10px;
+            text-align: left;
+            border: 0;
+            background: transparent;
+            color: inherit;
 
             &.selected {
                 color: $primary;

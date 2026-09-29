@@ -61,11 +61,11 @@
             <Label>Cancel</Label>
         </Button>
         {#if homed}
-            <Button on:click={onUnhome}>
+            <Button onclick={onUnhome}>
                 <Label>Unhome</Label>
             </Button>
         {/if}
-        <Button defaultAction on:click={onConfirm}>
+        <Button defaultAction onclick={onConfirm}>
             <Label>Set</Label>
         </Button>
     </Actions>

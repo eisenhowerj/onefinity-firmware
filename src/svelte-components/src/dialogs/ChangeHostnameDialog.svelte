@@ -93,7 +93,7 @@
         <Button
             tag="button"
             defaultAction
-            on:click={onConfirm}
+            onclick={onConfirm}
             disabled={hostname.length === 0}
         >
             <Label>Confirm & Reboot</Label>

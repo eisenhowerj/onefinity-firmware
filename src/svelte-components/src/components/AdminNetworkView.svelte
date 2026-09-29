@@ -67,7 +67,7 @@
     <div style="display:flex; flex-direction:row; justify-content:space-between" >
             <h1>Network Info</h1>
              <div style="text-align: center; padding:20px">
-            <Button on:click={refreshWifi} touch variant="raised">
+            <Button onclick={refreshWifi} touch variant="raised">
                 <Label>Refresh WiFi</Label>
             </Button>
             </div>
@@ -81,7 +81,7 @@
                     {$networkInfo.hostname}
                 </Text>
             </Card>
-            <Button on:click={onChangeHostname} touch variant="raised">
+            <Button onclick={onChangeHostname} touch variant="raised">
                 <Label>Change</Label>
             </Button>
         </div>
@@ -116,7 +116,7 @@
                             {#each $networkInfo.wifi.networks as network}
                                 <Item
                                     class="wifi-network"
-                                    on:SMUI:action={() =>
+                                    onSMUIListAction={() =>
                                         onNetworkSelected(network)}
                                 >
                                     <Graphic
@@ -125,20 +125,20 @@
                                             ? 'active'
                                             : ''}"
                                     >
-                                        <span class="fa fa-wifi background" />
+                                        <span class="fa fa-wifi background"></span>
                                         <span
                                             class="fa fa-wifi"
                                             style={getWifiStrengthStyle(
                                                 network
                                             )}
-                                        />
+                                        ></span>
                                     </Graphic>
                                     <Text style="margin-right: 20px;"
                                         >{network.Name}</Text
                                     >
                                     {#if network.Encryption !== "Open"}
                                         <Meta>
-                                            <span class="fa fa-lock" />
+                                            <span class="fa fa-lock"></span>
                                         </Meta>
                                     {/if}
                                 </Item>

@@ -42,8 +42,8 @@
 <div class="textfield-with-options">
     <TextField
         bind:value
-        on:focusin={() => showMenu(true)}
-        on:focusout={() => showMenu(false)}
+        onfocusin={() => showMenu(true)}
+        onfocusout={() => showMenu(false)}
         use={[virtualKeyboardChange((v) => (value = v))]}
         {...$$restProps}
     >
@@ -61,7 +61,7 @@
                 <List>
                     {#each group as option}
                         <Item
-                            on:SMUI:action={() => {
+                            onSMUIListAction={() => {
                                 value = option;
                                 showMenu(false);
 

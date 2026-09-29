@@ -47,7 +47,7 @@
         <Button>
             <Label>Cancel</Label>
         </Button>
-        <Button defaultAction on:click={onConfirm}>
+        <Button defaultAction onclick={onConfirm}>
             <Label>Set</Label>
         </Button>
     </Actions>

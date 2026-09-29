@@ -20,7 +20,8 @@ export default defineConfig({
             entry: resolve(__dirname, "src/main.ts"),
             name: "SvelteComponents",
             formats: [ "iife" ],
-            fileName: () => "index.js"
+            fileName: () => "index.js",
+            cssFileName: "style"
         }
     }
 });

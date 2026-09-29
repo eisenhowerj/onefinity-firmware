@@ -26,7 +26,7 @@
             <Label>Cancel</Label>
         </Button>
 
-        <Button defaultAction use={[InitialFocus]} on:click={home}>
+        <Button defaultAction use={[InitialFocus]} onclick={home}>
             <Label>OK</Label>
         </Button>
     </Actions>

@@ -1,7 +1,6 @@
-import sveltePreprocess from "svelte-preprocess";
+// eslint-disable-next-line import/no-unresolved -- resolved from this package's node_modules
+import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 
 export default {
-    // Consult https://github.com/sveltejs/svelte-preprocess
-    // for more information about preprocessors
-    preprocess: sveltePreprocess()
+    preprocess: vitePreprocess()
 };

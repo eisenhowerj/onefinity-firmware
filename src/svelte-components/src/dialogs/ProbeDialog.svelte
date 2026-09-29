@@ -521,7 +521,7 @@
 
     <Actions>
         {#if showCancelButton}
-            <Button on:click={() => ($cancelled = true)}>
+            <Button onclick={() => ($cancelled = true)}>
                 <Label>Cancel</Label>
             </Button>
         {/if}
@@ -530,7 +530,7 @@
             defaultAction
             data-mdc-dialog-action={nextButton.allowClose ? "close" : ""}
             disabled={nextButton.disabled}
-            on:click={() => ($userAcknowledged = true)}
+            onclick={() => ($userAcknowledged = true)}
         >
             <Label>
                 {nextButton.label}

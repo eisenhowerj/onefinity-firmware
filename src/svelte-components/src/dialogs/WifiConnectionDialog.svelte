@@ -75,7 +75,16 @@
             >
                 <div
                     slot="trailingIcon"
-                    on:click={() => (showPassword = !showPassword)}
+                    role="button"
+                    tabindex="0"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    onclick={() => (showPassword = !showPassword)}
+                    onkeydown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            showPassword = !showPassword;
+                        }
+                    }}
                 >
                     <Icon
                         class={`fa ${showPassword ? "fa-eye-slash" : "fa-eye"}`}
@@ -103,7 +112,7 @@
         <Button
             tag="button"
             defaultAction
-            on:click={onConfirm}
+            onclick={onConfirm}
             disabled={needPassword &&
                 (password.length < 8 || password.length > 128)}
         >
