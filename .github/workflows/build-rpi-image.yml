@@ -19,7 +19,11 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: |
+            package-lock.json
+            src/svelte-components/package-lock.json
       
       - name: Get version
         id: version
@@ -47,8 +51,7 @@ jobs:
           pip3 install --user --break-system-packages tornado sockjs-tornado pyserial pyudev smbus2 watchdog
       
       - name: Install Node dependencies
-        run: |
-          npm install
+        run: npm ci
       
       - name: Build Debian package
         run: |
