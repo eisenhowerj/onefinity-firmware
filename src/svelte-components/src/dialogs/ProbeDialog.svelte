@@ -526,6 +526,7 @@
             </Button>
         {/if}
         <Button
+            tag="button"
             defaultAction
             data-mdc-dialog-action={nextButton.allowClose ? "close" : ""}
             disabled={nextButton.disabled}

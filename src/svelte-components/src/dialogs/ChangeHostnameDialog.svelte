@@ -91,6 +91,7 @@
             <Label>Cancel</Label>
         </Button>
         <Button
+            tag="button"
             defaultAction
             on:click={onConfirm}
             disabled={hostname.length === 0}

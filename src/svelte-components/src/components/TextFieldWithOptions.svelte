@@ -2,14 +2,12 @@
     import TextField from "@smui/textfield";
     import Icon from "@smui/textfield/icon";
     import HelperText from "@smui/textfield/helper-text";
-    import MenuSurface, {
-        type MenuSurfaceComponentDev,
-    } from "@smui/menu-surface";
+    import MenuSurface from "@smui/menu-surface";
     import List, { Item, Text } from "@smui/list";
     import { virtualKeyboardChange } from "$lib/CustomActions";
     import { onDestroy } from "svelte";
 
-    let menuSurface: MenuSurfaceComponentDev;
+    let menuOpen = false;
     let menuTimeout;
     let optionSelected: boolean = false;
 
@@ -37,7 +35,7 @@
         }
 
         // Use a timeout to "debounce" the display of the menu.
-        menuTimeout = setTimeout(() => menuSurface.setOpen(show), 100);
+        menuTimeout = setTimeout(() => (menuOpen = show), 100);
     }
 </script>
 
@@ -57,7 +55,7 @@
         <HelperText persistent slot="helper">{helperText}</HelperText>
     </TextField>
 
-    <MenuSurface bind:this={menuSurface} anchorCorner="BOTTOM_LEFT">
+    <MenuSurface bind:open={menuOpen} anchorCorner="BOTTOM_LEFT">
         <div style="display: flex; flex-direction: row;">
             {#each options as group}
                 <List>

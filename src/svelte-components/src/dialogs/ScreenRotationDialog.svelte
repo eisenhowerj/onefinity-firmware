@@ -62,6 +62,7 @@
             <Label>Cancel</Label>
         </Button>
         <Button
+            tag="button"
             defaultAction
             disabled={value === currentValue}
             on:click={onConfirm}

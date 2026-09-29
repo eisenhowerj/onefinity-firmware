@@ -23,6 +23,7 @@
             <div class="pure-control-group">
                 <label for="screen-rotation" />
                 <Button
+                    tag="button"
                     name="screen-rotation"
                     touch
                     variant="raised"
