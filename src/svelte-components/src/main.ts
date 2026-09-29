@@ -14,16 +14,16 @@ import { registerControllerMethods } from "$lib/RegisterControllerMethods";
 export function createComponent(component: string, target: HTMLElement, props: Record<string, any>) {
     switch (component) {
         case "AdminNetworkView":
-            return new AdminNetworkView({ target, props });
+            return new AdminNetworkView({ target, props: props as never });
 
         case "SettingsView":
-            return new SettingsView({ target, props });
+            return new SettingsView({ target, props: props as never });
 
         case "HelpView":
-            return new HelpView({ target, props });
+            return new HelpView({ target, props: props as never });
 
         case "DialogHost":
-            return new DialogHost({ target, props });
+            return new DialogHost({ target, props: props as never });
 
         default:
             throw new Error("Unknown component");

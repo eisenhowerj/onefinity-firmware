@@ -1,4 +1,4 @@
-<script type="ts">
+<script lang="ts">
     import Dialog, { Title, Content, Actions } from "@smui/dialog";
     import Button, { Label } from "@smui/button";
     import LinearProgress from "@smui/linear-progress";
