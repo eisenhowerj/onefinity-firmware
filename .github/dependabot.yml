@@ -1,0 +1,75 @@
+# Dependabot configuration for OneFinity CNC Controller firmware.
+#
+# This complements (rather than duplicates) the `dependency-update.yml`
+# workflow:
+#   - Dependabot opens PRs that bump one ecosystem/dependency-group at a
+#     time using GitHub's native update logic and security advisories.
+#   - `dependency-update.yml` runs `npm-check-updates` / `pip-compile`
+#     to batch-update everything in a single PR for a quicker, broader
+#     refresh.
+#
+# Both run weekly. To avoid duplicate/conflicting PRs, `dependency-update.yml`
+# is scheduled a few hours after Dependabot on the same day, and either PR can
+# simply be closed if the other already covers the same updates that week.
+version: 2
+updates:
+  # Root npm package (build tooling, linting, etc.)
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "04:00"
+      timezone: "Etc/UTC"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "npm"
+    commit-message:
+      prefix: "chore(deps)"
+
+  # Svelte UI components
+  - package-ecosystem: "npm"
+    directory: "/src/svelte-components"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "04:00"
+      timezone: "Etc/UTC"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "npm"
+      - "svelte-components"
+    commit-message:
+      prefix: "chore(deps)"
+
+  # Python dependencies
+  - package-ecosystem: "pip"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "04:00"
+      timezone: "Etc/UTC"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "python"
+    commit-message:
+      prefix: "chore(deps)"
+
+  # GitHub Actions workflows
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "04:00"
+      timezone: "Etc/UTC"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "github-actions"
+    commit-message:
+      prefix: "chore(deps)"
