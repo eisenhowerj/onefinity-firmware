@@ -43,7 +43,7 @@
             <Label>No</Label>
         </Button>
 
-        <Button defaultAction use={[InitialFocus]} on:click={() =>switchMode(isActive)}>
+        <Button defaultAction use={[InitialFocus]} onclick={() =>switchMode(isActive)}>
             <Label>Yes</Label>
         </Button>
     </Actions>

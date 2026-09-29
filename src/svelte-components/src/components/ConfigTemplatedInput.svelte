@@ -186,7 +186,7 @@
         {:else if template.type === "string"}
             <input {name} type="text" bind:value on:keyup={onChange} />
         {:else if template.type == "text"}
-            <textarea {name} bind:value on:keyup={onChange} />
+            <textarea {name} bind:value on:keyup={onChange}></textarea>
         {/if}
 
         <label for="" class="units">{units || ""}</label>

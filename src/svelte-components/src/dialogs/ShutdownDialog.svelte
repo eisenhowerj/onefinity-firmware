@@ -27,11 +27,11 @@
             <Label>Cancel</Label>
         </Button>
 
-        <Button on:click={shutdown}>
+        <Button onclick={shutdown}>
             <Label>Shutdown</Label>
         </Button>
 
-        <Button use={[InitialFocus]} on:click={restart}>
+        <Button use={[InitialFocus]} onclick={restart}>
             <Label>Restart</Label>
         </Button>
     </Actions>

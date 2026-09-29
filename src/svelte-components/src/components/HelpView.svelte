@@ -19,7 +19,7 @@
 <!-- <Button
     touch
     variant="raised"
-    on:click={() => (showRemoteDiagnosticsDialog = true)}
+    onclick={() => (showRemoteDiagnosticsDialog = true)}
 >
     <Label>Remote Diagnostics</Label>
 </Button> -->

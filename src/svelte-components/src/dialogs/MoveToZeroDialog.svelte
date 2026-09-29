@@ -25,7 +25,7 @@
         <Button
             defaultAction
             use={[InitialFocus]}
-            on:click={() => ControllerMethods.gotoZero(axes)}
+            onclick={() => ControllerMethods.gotoZero(axes)}
         >
             <Label>Confirm</Label>
         </Button>

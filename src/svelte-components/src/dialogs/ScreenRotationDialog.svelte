@@ -65,7 +65,7 @@
             tag="button"
             defaultAction
             disabled={value === currentValue}
-            on:click={onConfirm}
+            onclick={onConfirm}
         >
             <Label>Confirm & Reboot</Label>
         </Button>

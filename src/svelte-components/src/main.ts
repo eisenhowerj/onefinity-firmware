@@ -1,5 +1,6 @@
 import "polyfill-object.fromentries";
 import matchAll from "string.prototype.matchall";
+import { mount, unmount, type Component } from "svelte";
 
 matchAll.shim();
 
@@ -12,18 +13,27 @@ import { handleControllerStateUpdate } from "$lib/ControllerState";
 import { registerControllerMethods } from "$lib/RegisterControllerMethods";
 
 export function createComponent(component: string, target: HTMLElement, props: Record<string, any>) {
+    const mountComponent = (component: Component<any>) => {
+        const instance = mount(component, {
+            target: target ?? document.createElement("div"),
+            props
+        });
+
+        return { $destroy: () => unmount(instance) };
+    };
+
     switch (component) {
         case "AdminNetworkView":
-            return new AdminNetworkView({ target, props: props as never });
+            return mountComponent(AdminNetworkView);
 
         case "SettingsView":
-            return new SettingsView({ target, props: props as never });
+            return mountComponent(SettingsView);
 
         case "HelpView":
-            return new HelpView({ target, props: props as never });
+            return mountComponent(HelpView);
 
         case "DialogHost":
-            return new DialogHost({ target, props: props as never });
+            return mountComponent(DialogHost);
 
         default:
             throw new Error("Unknown component");

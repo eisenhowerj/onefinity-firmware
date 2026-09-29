@@ -76,7 +76,7 @@
     </Content>
 
     <Actions>
-        <Button on:click={onCancel} use={[InitialFocus]}>
+        <Button onclick={onCancel} use={[InitialFocus]}>
             <Label>Cancel</Label>
         </Button>
     </Actions>

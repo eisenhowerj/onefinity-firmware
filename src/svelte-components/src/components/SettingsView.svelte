@@ -21,13 +21,12 @@
         <h2>User Interface</h2>
         <fieldset>
             <div class="pure-control-group">
-                <label for="screen-rotation" />
                 <Button
                     tag="button"
                     name="screen-rotation"
                     touch
                     variant="raised"
-                    on:click={() => (showScreenRotationDialog = true)}
+                    onclick={() => (showScreenRotationDialog = true)}
                 >
                     <Label>Change Screen Rotation</Label>
                 </Button>

@@ -89,6 +89,9 @@ onefinity-firmware/
 ## Building from Source
 
 ### Debian Package
+
+The Svelte build requires Node.js 20.19+ or 22.12+.
+
 ```bash
 # Install build dependencies
 sudo apt-get install -y build-essential gcc-avr avr-libc \

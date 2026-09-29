@@ -16,6 +16,8 @@ workflows with self-hosted ARM64 runners instead of x86 emulation.
 
 ## Installing the Development Prerequisites
 
+The Svelte build requires Node.js 20.19+ or 22.12+.
+
 ### For Local Development (Any Debian-based System)
 
 On a Debian/Ubuntu Linux system, install the required packages:
