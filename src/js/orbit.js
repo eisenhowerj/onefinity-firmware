@@ -19,7 +19,6 @@
 
 const OrbitControls = function(object, domElement) {
     // internals
-    // eslint-disable-next-line @typescript-eslint/no-this-alias
     const scope = this;
 
     const changeEvent = { type: "change" };
