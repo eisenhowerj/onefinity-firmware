@@ -12,7 +12,11 @@ import { handleConfigUpdate, setDisplayUnits } from "$lib/ConfigStore";
 import { handleControllerStateUpdate } from "$lib/ControllerState";
 import { registerControllerMethods } from "$lib/RegisterControllerMethods";
 
-export function createComponent(component: string, target: HTMLElement, props: Record<string, any>) {
+export function createComponent(
+    component: string,
+    target?: HTMLElement,
+    props: Record<string, any> = {}
+) {
     const mountComponent = (component: Component<any>) => {
         const instance = mount(component, {
             target: target ?? document.createElement("div"),

@@ -81,6 +81,7 @@
                     onclick={() => (showPassword = !showPassword)}
                     onkeydown={(event) => {
                         if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
                             showPassword = !showPassword;
                         }
                     }}
