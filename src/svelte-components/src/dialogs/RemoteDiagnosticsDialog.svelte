@@ -57,6 +57,7 @@
         </Button>
 
         <Button
+            tag="button"
             defaultAction
             on:click={onContinue}
             disabled={code?.length !== 6}

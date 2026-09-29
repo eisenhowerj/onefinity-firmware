@@ -246,6 +246,7 @@
             <Label>Cancel</Label>
         </Button>
         <Button
+            tag="button"
             defaultAction
             disabled={selectedTimezoneIndex === -1}
             on:click={onConfirm}
