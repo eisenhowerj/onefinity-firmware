@@ -10,6 +10,12 @@ name: Dependency Update
 # once. It runs a few hours after Dependabot's Monday run so any updates
 # Dependabot already opened PRs for can be reviewed first; if both produce
 # overlapping changes, simply close the duplicate PR.
+#
+# Note: PRs are created using the default GITHUB_TOKEN, which (by GitHub
+# design) does not trigger other workflows (e.g. CI checks) on the resulting
+# PR. If automatic CI runs on these PRs are required, configure a
+# repository/organization PAT or GitHub App token and pass it as the `token`
+# input below instead.
 on:
   schedule:
     # Every Monday at 09:00 UTC (Dependabot runs at 04:00 UTC, see
@@ -55,6 +61,11 @@ jobs:
           npx --yes npm-check-updates --target minor -u
           npm install --package-lock-only
 
+      # create-pull-request detects whether npm-check-updates left any
+      # working-tree changes and automatically skips creating a PR (and
+      # skips updating an existing one with no new changes) when there is
+      # nothing to commit, so "no updates available" weeks don't produce
+      # empty/no-op PRs.
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
         with:
@@ -98,6 +109,8 @@ jobs:
           pip-compile --upgrade --output-file=requirements.txt requirements.in
           pip-compile --upgrade --output-file=requirements-dev.txt requirements-dev.in
 
+      # See the note on the npm job's Create Pull Request step: this action
+      # skips creating/updating a PR when pip-compile made no changes.
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v6
         with:
