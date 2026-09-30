@@ -1,76 +1,96 @@
-#!/usr/bin/env python3
-"""Test script for GPIO compatibility layer"""
-
+import importlib.util
 import sys
-import os
+from pathlib import Path
+from types import ModuleType, SimpleNamespace
+from unittest.mock import Mock
 
-# Add the src/py directory to the path
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src', 'py'))
+import pytest
 
-def test_import():
-    """Test that the GPIO compatibility layer can be imported"""
+GPIO_COMPAT = Path(__file__).parents[1] / "src" / "py" / "bbctrl" / "gpio_compat.py"
+
+
+def load_gpio_compat(monkeypatch, lgpio=None, rpi_gpio=None):
+    if lgpio is None:
+        monkeypatch.setitem(sys.modules, "lgpio", None)
+    else:
+        monkeypatch.setitem(sys.modules, "lgpio", lgpio)
+
+    if rpi_gpio is not None:
+        rpi = ModuleType("RPi")
+        rpi.__path__ = []
+        monkeypatch.setitem(sys.modules, "RPi", rpi)
+        monkeypatch.setitem(sys.modules, "RPi.GPIO", rpi_gpio)
+
+    spec = importlib.util.spec_from_file_location("gpio_compat_under_test", GPIO_COMPAT)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def test_lgpio_backend_delegates_pin_operations(monkeypatch):
+    lgpio = SimpleNamespace(
+        SET_PULL_UP=1,
+        gpiochip_open=Mock(return_value=4),
+        gpio_claim_output=Mock(),
+        gpio_claim_input=Mock(),
+        gpio_write=Mock(),
+        gpio_read=Mock(return_value=1),
+        gpio_free=Mock(),
+        gpiochip_close=Mock(),
+    )
+    gpio = load_gpio_compat(monkeypatch, lgpio=lgpio)
+
+    instance = gpio.GPIOCompat()
+    instance.setup(17, gpio.OUT)
+    instance.setup(18, gpio.IN, gpio.PUD_UP)
+    instance.output(17, 1)
+
+    assert instance.input(18) == 1
+    lgpio.gpio_claim_output.assert_called_with(4, 17, 0)
+    lgpio.gpio_claim_input.assert_called_with(4, 18, 1)
+    lgpio.gpio_write.assert_called_with(4, 17, 1)
+    lgpio.gpio_read.assert_called_with(4, 18)
+
+    instance.cleanup()
+    assert lgpio.gpio_free.call_count == 2
+    lgpio.gpiochip_close.assert_called_once_with(4)
+
+
+def test_rpi_gpio_fallback_delegates_pin_operations(monkeypatch):
+    rpi_gpio = SimpleNamespace(
+        BCM=11,
+        OUT=1,
+        IN=0,
+        PUD_UP=2,
+        PUD_DOWN=3,
+        setwarnings=Mock(),
+        setmode=Mock(),
+        setup=Mock(),
+        output=Mock(),
+        input=Mock(return_value=1),
+        cleanup=Mock(),
+    )
+    gpio = load_gpio_compat(monkeypatch, rpi_gpio=rpi_gpio)
+
+    instance = gpio.GPIOCompat()
+    instance.setup(17, gpio.OUT)
+    instance.setup(18, gpio.IN, gpio.PUD_UP)
+    instance.output(17, 1)
+
+    assert instance.input(18) == 1
+    rpi_gpio.setup.assert_any_call(17, rpi_gpio.OUT)
+    rpi_gpio.setup.assert_any_call(18, rpi_gpio.IN, pull_up_down=rpi_gpio.PUD_UP)
+    rpi_gpio.output.assert_called_once_with(17, 1)
+    instance.cleanup()
+    rpi_gpio.cleanup.assert_called_once_with()
+
+
+@pytest.mark.hardware
+def test_pi5_gpio_chip_is_available():
+    lgpio = pytest.importorskip("lgpio")
+    handle = lgpio.gpiochip_open(4)
     try:
-        from bbctrl import gpio_compat
-        print("✓ GPIO compatibility layer imported successfully")
-        return True
-    except ImportError as e:
-        print(f"✗ Failed to import GPIO compatibility layer: {e}")
-        return False
-
-def test_attributes():
-    """Test that required attributes are available"""
-    from bbctrl import gpio_compat
-    
-    required_attrs = ['BCM', 'OUT', 'IN', 'PUD_UP', 'setwarnings', 
-                      'setmode', 'setup', 'output', 'input', 'cleanup']
-    
-    all_present = True
-    for attr in required_attrs:
-        if hasattr(gpio_compat, attr):
-            print(f"✓ Attribute '{attr}' present")
-        else:
-            print(f"✗ Attribute '{attr}' missing")
-            all_present = False
-    
-    return all_present
-
-def test_backend():
-    """Test which GPIO backend is being used"""
-    from bbctrl import gpio_compat
-    
-    try:
-        import lgpio
-        print("✓ Using lgpio backend (Raspberry Pi 5 compatible)")
-        return True
-    except ImportError:
-        pass
-    
-    try:
-        import RPi.GPIO
-        print("✓ Using RPi.GPIO backend (Raspberry Pi 3 compatible)")
-        return True
-    except ImportError:
-        pass
-    
-    print("✗ No GPIO backend available")
-    return False
-
-if __name__ == '__main__':
-    print("Testing GPIO Compatibility Layer")
-    print("=" * 50)
-    
-    results = []
-    results.append(("Import test", test_import()))
-    
-    if results[0][1]:  # Only run other tests if import succeeded
-        results.append(("Attributes test", test_attributes()))
-        results.append(("Backend detection", test_backend()))
-    
-    print("\n" + "=" * 50)
-    print("Test Results:")
-    for name, result in results:
-        status = "PASS" if result else "FAIL"
-        print(f"  {name}: {status}")
-    
-    all_passed = all(result for _, result in results)
-    sys.exit(0 if all_passed else 1)
+        assert handle >= 0
+    finally:
+        if handle >= 0:
+            lgpio.gpiochip_close(handle)

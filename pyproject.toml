@@ -148,12 +148,17 @@ addopts = [
     "--strict-markers",
     "--strict-config",
     "--showlocals",
+    "-m",
+    "not hardware",
 ]
 testpaths = ["tests"]
 pythonpath = ["src/py"]
 python_files = ["test_*.py", "*_test.py"]
 python_classes = ["Test*"]
 python_functions = ["test_*"]
+markers = [
+    "hardware: requires physical hardware or hardware-specific drivers",
+]
 
 # Coverage configuration
 [tool.coverage.run]
