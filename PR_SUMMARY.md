@@ -1,18 +1,27 @@
 # PR Summary: Modernize Project Structure
 
+> **Historical PR summary:** Current firmware supports Raspberry Pi 5 (ARM64)
+> only. The present runtime and build requirements are Python 3.11+ and Node.js
+> 22.22.2+; use [README.md](README.md) and [DEPLOYMENT.md](DEPLOYMENT.md) for
+> current guidance.
+
 ## Overview
+
 This PR successfully implements the complete modernization plan for the OneFinity firmware repository, restructuring the project for better deployment and CI/CD while maintaining backward compatibility.
 
 ## What Was Accomplished
 
 ### 1. ✅ Debian Packaging Infrastructure
+
 Created a professional Debian packaging system:
+
 - **Package Name**: `onefinity-firmware`
 - **Installation Path**: `/opt/onefinity/`
 - **Service Management**: Systemd service with dedicated user
 - **Easy Upgrades**: `apt install ./onefinity-firmware_*.deb`
 
 **Files Created:**
+
 - `debian/control` - Package metadata and dependencies
 - `debian/rules` - Build automation
 - `debian/changelog` - Version history
@@ -21,24 +30,30 @@ Created a professional Debian packaging system:
 - `debian/compat` & `debian/copyright`
 
 ### 2. ✅ CI/CD Workflows
+
 Implemented GitHub Actions workflows using self-hosted ARM64 runners:
 
 **New Workflows:**
+
 - `build-debian-package.yml` - Automated Debian package builds
 - `build-rpi-image.yml` - SD card image generation for Pi 3 and Pi 5
 - `build-rpi-image.sh` - Image building script with chroot installation
 
 **Updated Workflows:**
+
 - `build-test.yml` - Now uses `[self-hosted, linux, arm64]`
 - `release.yml` - Builds both .tar.bz2 and .deb packages
 
 **Benefits:**
+
 - Native ARM builds (no QEMU emulation)
 - Faster build times
 - Reproducible builds
 
 ### 3. ✅ SD Card Image Builder
+
 Automated image generation for turnkey deployments:
+
 - Downloads base Raspberry Pi OS
 - Installs OneFinity Debian package
 - Configures system (hostname, GPIO, I2C, boot settings)
@@ -48,17 +63,20 @@ Automated image generation for turnkey deployments:
 ### 4. ✅ Comprehensive Documentation
 
 **New Documents:**
+
 - `MODERNIZATION_PLAN.md` - Complete architecture and planning (11.7 KB)
 - `DEPLOYMENT.md` - User installation guide (9.6 KB)
 - `IMPLEMENTATION_SUMMARY.md` - Technical implementation details (14.5 KB)
 
 **Updated Documents:**
+
 - `README.md` - New quick start guide with installation options
 - `docs/development.md` - Updated developer workflow
 
 ### 5. ✅ Quality Improvements
 
 **Code Review Fixes:**
+
 - ✅ Separated build commands for better error handling
 - ✅ Created dedicated system user (`onefinity`) for service
 - ✅ Fixed boot config paths for different Pi models
@@ -66,12 +84,14 @@ Automated image generation for turnkey deployments:
 - ✅ Clarified hostname documentation
 
 **Security Fixes:**
+
 - ✅ Added explicit GITHUB_TOKEN permissions to all workflows
 - ✅ CodeQL analysis passes with 0 alerts
 
 ## File Changes Summary
 
 **17 Files Changed:**
+
 - **13 New Files**: Complete Debian packaging + CI/CD workflows + Documentation
 - **4 Modified Files**: Updated existing workflows and docs
 
@@ -98,6 +118,7 @@ M  docs/development.md
 ## Installation Methods
 
 ### Method 1: SD Card Image (Recommended for New Installations)
+
 ```bash
 # Download image from releases
 wget https://github.com/eisenhowerj/onefinity-firmware/releases/download/vX.X.X/onefinity-X.X.X-rpi3-armhf.img.xz
@@ -109,6 +130,7 @@ xz -d -c onefinity-X.X.X-rpi3-armhf.img.xz | sudo dd of=/dev/sdX bs=4M status=pr
 ```
 
 ### Method 2: Debian Package (For Existing Systems)
+
 ```bash
 # Download package
 wget https://github.com/eisenhowerj/onefinity-firmware/releases/download/vX.X.X/onefinity-firmware_X.X.X_arm64.deb
@@ -122,6 +144,7 @@ sudo systemctl start onefinity
 ```
 
 ### Method 3: Legacy (Backward Compatible)
+
 ```bash
 # Still works!
 make pkg
@@ -153,10 +176,12 @@ Create tag (vX.X.X)
 ## Requirements for Production
 
 ### Self-Hosted Runner Setup Required
+
 To use these workflows, you need:
 
 1. **ARM64 Linux System** (Raspberry Pi 4/5, ARM server, etc.)
 2. **Install GitHub Actions Runner**:
+
    ```bash
    # On your ARM64 system
    mkdir actions-runner && cd actions-runner
@@ -169,6 +194,7 @@ To use these workflows, you need:
    ```
 
 3. **Install Build Dependencies** on runner:
+
    ```bash
    sudo apt-get install -y \
      build-essential gcc-avr avr-libc nodejs npm \
@@ -201,9 +227,11 @@ Before merging to production:
   - [ ] Test troubleshooting steps
 
 ## Breaking Changes
-**None!** 
+
+**None!**
 
 All changes are additive:
+
 - Legacy `make` commands still work
 - Existing installations not affected
 - New deployment methods are optional
@@ -211,16 +239,19 @@ All changes are additive:
 ## Benefits
 
 ### For End Users:
+
 - 🚀 **Faster Setup**: Flash SD image and power on
 - 📦 **Easy Updates**: `sudo apt upgrade onefinity-firmware`
 - 📖 **Better Docs**: Clear installation and troubleshooting guides
 
 ### For Developers:
+
 - ⚡ **Faster Builds**: Native ARM (no emulation)
 - 🔧 **Standard Tools**: Debian packaging + GitHub Actions
 - 📚 **Clear Structure**: Well-documented architecture
 
 ### For Maintenance:
+
 - 🔄 **Reproducible**: Standard build process
 - 🤖 **Automated**: CI/CD handles everything
 - 📈 **Scalable**: Ready for future expansion
@@ -236,18 +267,21 @@ All changes are additive:
 ## Support & Documentation
 
 All questions answered in:
+
 - `MODERNIZATION_PLAN.md` - Architecture and planning
 - `DEPLOYMENT.md` - Installation guide
 - `IMPLEMENTATION_SUMMARY.md` - Technical details
 - `docs/development.md` - Developer guide
 
 ## Security
+
 - ✅ CodeQL analysis: 0 alerts
 - ✅ Explicit workflow permissions
 - ✅ Dedicated system user
 - ✅ Proper file permissions
 
 ## Commits in This PR
+
 1. Initial plan
 2. Update modernization plan to use GitHub workflows instead of Makefile
 3. Add Debian packaging and CI/CD workflows for modernized build process

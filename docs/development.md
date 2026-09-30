@@ -16,7 +16,9 @@ workflows with self-hosted ARM64 runners instead of x86 emulation.
 
 ## Installing the Development Prerequisites
 
-The Svelte build requires Node.js 20.19+ or 22.12+.
+The project requires Node.js 22.22.2 or later (CI currently uses Node.js 24)
+and Python 3.11 or later. The Svelte UI uses Svelte 5 and Vite 7; Vitest is
+used for the JavaScript test suite.
 
 ### For Local Development (Any Debian-based System)
 
@@ -33,14 +35,26 @@ sudo apt-get install -y \
     avrdude \
     python3 \
     python3-pip \
+    python3-venv \
     python3-setuptools \
-    nodejs \
-    npm \
     curl
 
-# Install Python dependencies
-pip3 install tornado sockjs-tornado pyserial pyudev smbus2 watchdog
+# Install Python development dependencies in a virtual environment
+python3 -m venv --system-site-packages .venv
+. .venv/bin/activate
+python -m pip install 'setuptools<81'
+python -m pip install -r requirements-dev.txt
 ```
+
+Install a Node.js version meeting the requirement above, then verify it:
+
+```bash
+node --version
+npm --version
+```
+
+On Debian Bookworm, the distribution's Node.js package may not meet the project
+minimum; use a Node.js installation that does.
 
 ### For Building Debian Packages (ARM64 System)
 
@@ -91,13 +105,15 @@ cd onefinity-firmware
 
 ```bash
 # Install Node dependencies
-npm install
+npm ci
 
 # Build all components
 make all
 ```
 
-This will:
+The root `npm ci` also installs the Svelte component dependencies. `make all`
+will:
+
 - Build the web frontend (JavaScript, Svelte components, CSS)
 - Build AVR firmware
 - Build other subprojects (boot, pwr, jig)
@@ -110,10 +126,38 @@ This will:
 make -C src/avr
 
 # Build only frontend
-cd src/svelte-components && npm run build
+(cd src/svelte-components && npm run build)
+
+# Check Svelte components
+(cd src/svelte-components && npm run check)
 
 # Build Python package
 python3 setup.py build
+```
+
+## Testing
+
+Run the project tests from the repository root:
+
+```bash
+python -m pytest
+```
+
+The GPIO tests require an available GPIO backend. On Raspberry Pi 5, install
+`python3-lgpio` (`sudo apt-get install python3-lgpio`) before running them.
+They access GPIO chip 4, so run them on a Pi 5; the development virtual
+environment shares system packages so it can import the OS-provided GPIO
+module.
+
+The `npm test` command runs Vitest, but there are currently no JavaScript test
+files in the repository.
+
+To check and build the Svelte 5 UI independently:
+
+```bash
+cd src/svelte-components
+npm run check
+npm run build
 ```
 
 ## Build GPlan Module
@@ -133,6 +177,7 @@ Or use the build script directly:
     ./scripts/gplan-build-native.sh
 
 This will:
+
 - Clone the required dependencies (cbang and camotics)
 - Build the gplan.so module natively
 - Install it to `src/py/camotics/gplan.so`
@@ -186,21 +231,23 @@ git push origin main
 ```
 
 Workflows available:
+
 - `build-debian-package.yml` - Builds .deb package
 - `build-rpi-image.yml` - Builds SD card images for Raspberry Pi 5
 - `release.yml` - Creates releases with all artifacts
 
 ## Upload the Firmware Package to a Buildbotics CNC Controller
-If you have a Buildbotics CNC controller at ``bbctrl.local``, the default
+
+If you have a Buildbotics CNC controller at `bbctrl.local`, the default
 address, you can upgrade it with the new package like this:
 
     make update HOST=bbctrl.local PASSWORD=<pass>
 
-Where ``<pass>`` is the controller's admin password.
+Where `<pass>` is the controller's admin password.
 
 ## Updating the Pwr Firmware
 
-The Pwr firmware must be uploaded manually using an ISP programmer.  With the
+The Pwr firmware must be uploaded manually using an ISP programmer. With the
 programmer attached to the pwr chip ISP port on the Builbotics controller's
 main board run the following:
 
@@ -208,8 +255,8 @@ main board run the following:
 
 ## Initializing the main AVR firmware
 
-The main AVR must also be programmed manually the first time.  Later it will be
-automatically programmed by the RPi as part of the firmware install.  To perform
+The main AVR must also be programmed manually the first time. Later it will be
+automatically programmed by the RPi as part of the firmware install. To perform
 the initial AVR programming connec the ISP programmer to the main AVR's ISP port
 on the Buildbotics controller's main board and run the following:
 
@@ -217,65 +264,39 @@ on the Buildbotics controller's main board and run the following:
 
 This will set the fuses, install the bootloader and program the firmware.
 
-## Installing the RaspberryPi base system
+## Raspberry Pi 5 Base System
 
-Download the latest Raspberry Pi OS Lite ARM64 image and decompress it:
-
-    wget \
-      https://downloads.raspberrypi.org/raspios_lite_arm64/images/raspios_lite_arm64-2024-07-04/2024-07-04-raspios-bookworm-arm64-lite.img.xz
-    xz -d 2024-07-04-raspios-bookworm-arm64-lite.img.xz
-
-Now copy the base system to an SD card.  You need a card with at least 8GiB.
-After installing the RPi system all data on the SD card will be lost.  So make
-sure you back up the SD card if there's anything important on it.
-
-In the command below, make sure you have the correct device or you can
-**destroy your Linux system** by overwriting the disk.  One way to do this is
-to run ``sudo tail -f /var/log/syslog`` before inserting the SD card.  After
-inserting the card look for log messages containing ``/dev/sdx`` where ``x`` is
-a letter.  This should be the device name of the SD card.  Hit ``CTRL-C`` to
-stop following the system log.
-
-    sudo dd bs=4M if=2024-07-04-raspios-bookworm-arm64-lite.img of=/dev/sde
-    sudo sync
-
-The first command takes awhile and does not produce any output until it's done.
-
-Insert the SD card into your RPi and power it on.  Plug in the network
-connection, wired or wireless.
+The image build script pins the Raspberry Pi OS Bookworm ARM64 base image URL
+and produces the versioned Pi 5 image. Use the generated image or a release
+image as described in [DEPLOYMENT.md](../DEPLOYMENT.md), rather than writing an
+unmodified base image to the controller's SD card.
 
 ## Testing on Hardware
 
 ### SSH Access to OneFinity Controller
 
 You can SSH into the OneFinity Controller. The hostname depends on the installation method:
+
 - **SD Card Image**: `onefinity.local` (hostname set during image build)
-- **Manual Setup**: May still be `raspberrypi.local` or custom hostname
+- **Manual Setup**: The hostname configured on the Pi 5
 
 ```bash
-# For SD card image installations
-ssh pi@onefinity.local
-
-# For legacy Buildbotics installations
-ssh bbmc@bbctrl.local
+ssh <configured-user>@onefinity.local
 ```
 
-Default credentials (varies by installation method):
-- Username: `pi` or `bbmc`
-- Password: `onefinity` or `buildbotics`
-
-**Important**: Change the default password after first login!
+Configure SSH credentials when preparing the operating system, and change any
+initial password after first login.
 
 ### Testing Debian Package Installation
 
 1. Build the package (on ARM64 system or via CI)
-2. Copy to Raspberry Pi:
+2. Copy to the Raspberry Pi 5:
    ```bash
-   scp ../onefinity-firmware_*.deb bbmc@onefinity.local:~
+   scp ../onefinity-firmware_*.deb <configured-user>@onefinity.local:~
    ```
 3. Install on the Pi:
    ```bash
-   ssh bbmc@onefinity.local
+   ssh <configured-user>@onefinity.local
    sudo apt update
    sudo apt install ./onefinity-firmware_*.deb
    sudo systemctl start onefinity
@@ -463,7 +484,7 @@ Use AVR simulator or hardware debugger (requires external tools).
 - Check `debian/control` dependencies
 - Review build logs
 
-### Runtime Issues on Pi
+### Runtime Issues on Raspberry Pi 5
 
 - Check service status: `systemctl status onefinity`
 - Review logs: `journalctl -u onefinity`

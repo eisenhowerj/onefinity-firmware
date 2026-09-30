@@ -1,11 +1,20 @@
 # OneFinity Firmware Modernization Plan
 
+> **Historical plan:** This document records proposed work and examples from an
+> earlier phase; it is not the current build or deployment guide. The firmware
+> currently supports Raspberry Pi 5 (ARM64) only, requires Python 3.11+ and
+> Node.js 22.22.2+ to build, and uses Svelte 5 with Vite 7. See
+> [README.md](README.md), [DEPLOYMENT.md](DEPLOYMENT.md), and
+> [docs/development.md](docs/development.md) for current instructions.
+
 ## Overview
+
 This document outlines the plan to modernize the OneFinity CNC firmware project structure by splitting the monorepo into logical components with clear separation of concerns.
 
 ## Current Architecture
 
 ### Monorepo Components
+
 The current repository contains three major components:
 
 1. **HTTP Frontend** (Web UI)
@@ -29,12 +38,15 @@ The current repository contains three major components:
 ## Proposed Architecture
 
 ### Phase 1: In-Repo Restructuring (Current Work)
+
 Maintain the monorepo but clearly separate concerns through:
 
 #### 1.1 Debian Package Structure
+
 Create a Debian package containing frontend + controls that can be installed on any compatible RPi system.
 
 **Package Contents:**
+
 - Frontend HTTP files → `/opt/onefinity/http/`
 - Python backend → `/opt/onefinity/lib/python/`
 - AVR firmware → `/opt/onefinity/firmware/`
@@ -42,27 +54,32 @@ Create a Debian package containing frontend + controls that can be installed on 
 - Systemd service files → `/etc/systemd/system/`
 
 **Build Process:**
+
 - Add `debian/` directory with packaging metadata
 - GitHub workflow builds components and creates `.deb` package
 - No Makefile dependency - workflows handle all build steps
 - Package version from `package.json`
 
 **Benefits:**
+
 - Easy upgrades via `apt` or manual `.deb` installation
 - Standard Linux deployment model
 - Separates application from OS image
 - CI/CD-native approach without local Makefile complexity
 
 #### 1.2 RPi SD Card Image Builder
+
 Create infrastructure to build bootable SD card images with the Debian package pre-installed.
 
 **Image Contents:**
+
 - Base: Raspberry Pi OS Lite (Bookworm)
 - Pre-installed: OneFinity Debian package
 - Pre-configured: GPIO, I2C, boot settings, system services
 - Ready-to-use: Flash and power on
 
 **Build Process:**
+
 - Download base RPi OS image
 - Mount image partitions
 - Chroot and install Debian package
@@ -70,6 +87,7 @@ Create infrastructure to build bootable SD card images with the Debian package p
 - Create distributable image
 
 **Benefits:**
+
 - Turnkey solution for new installations
 - Reproducible builds
 - Maintains hardware-specific optimizations
@@ -77,9 +95,11 @@ Create infrastructure to build bootable SD card images with the Debian package p
 ### Phase 2: CI/CD Modernization (Current Work)
 
 #### 2.1 Self-Hosted ARM64 Runners
+
 Update all workflows to use self-hosted Debian arm64 runners instead of x86 with QEMU emulation.
 
 **Workflow Changes:**
+
 ```yaml
 jobs:
   build:
@@ -87,6 +107,7 @@ jobs:
 ```
 
 **Benefits:**
+
 - Native ARM builds (faster, no emulation overhead)
 - Direct hardware access for testing
 - Consistent build environment
@@ -94,22 +115,26 @@ jobs:
 #### 2.2 Automated Build Workflows
 
 **Debian Package Build** (`.github/workflows/build-debian-package.yml`)
+
 - Trigger: Push to main/develop, pull requests
 - Steps: Install deps → Build all → Create .deb → Upload artifact
 - Output: `onefinity-firmware_<version>_arm64.deb`
 
 **RPi Image Build** (`.github/workflows/build-rpi-image.yml`)
+
 - Trigger: Tag creation, manual dispatch
 - Steps: Download base image → Install package → Configure → Create image
 - Output: `onefinity-<version>-rpi.img.xz`
 
 **Release Workflow** (Update existing `release.yml`)
+
 - Trigger: Version tags (v*)
 - Steps: Build both package and image → Create GitHub release
 - Artifacts: .deb package + .img.xz image
 
 ### Phase 3: Future Repository Split (Future Work)
-*Note: This phase is documented for future planning but NOT implemented in current work*
+
+_Note: This phase is documented for future planning but NOT implemented in current work_
 
 When the project scales further, consider splitting into:
 
@@ -170,6 +195,7 @@ debian/
 
 **GitHub Workflow Approach:**
 Instead of extending the Makefile, all build logic is moved to GitHub workflows:
+
 - Workflows orchestrate the entire build process
 - Existing Makefile remains for local development only
 - Production builds use workflow scripts in `.github/workflows/scripts/`
@@ -201,6 +227,7 @@ Instead of extending the Makefile, all build logic is moved to GitHub workflows:
 ## Workflow Transition Plan
 
 ### Current Workflows
+
 - `build-test.yml`: Uses self-hosted EC2 runner, builds package
 - `release.yml`: Uses Ubuntu latest (x86), builds and releases
 - `tag.yml`: Creates version tags
@@ -208,6 +235,7 @@ Instead of extending the Makefile, all build logic is moved to GitHub workflows:
 ### Updated Workflows
 
 #### build-debian-package.yml (NEW)
+
 ```yaml
 name: Build Debian Package
 on: [push, pull_request, workflow_dispatch]
@@ -217,35 +245,35 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-      
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
-      
+
       - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential gcc-avr avr-libc \
             python3 python3-setuptools debhelper devscripts
-      
+
       - name: Build frontend
         run: |
           npm install
           cd src/svelte-components && npm install && npm run build
-      
+
       - name: Build AVR firmware
         run: |
           cd src/avr && make
-      
+
       - name: Build Python backend
         run: |
           python3 setup.py build
-      
+
       - name: Create Debian package
         run: |
           dpkg-buildpackage -us -uc -b
-      
+
       - name: Upload package
         uses: actions/upload-artifact@v4
         with:
@@ -254,6 +282,7 @@ jobs:
 ```
 
 #### build-rpi-image.yml (NEW)
+
 ```yaml
 name: Build RPi SD Image
 on:
@@ -271,6 +300,7 @@ jobs:
 ```
 
 #### release.yml (UPDATED)
+
 ```yaml
 name: Release
 on:
@@ -289,30 +319,35 @@ jobs:
 ## Migration Path
 
 ### Step 1: Add Debian Packaging (In Progress)
+
 - Create `debian/` directory structure
 - Add packaging metadata and build rules
 - Test local .deb builds
 - Update documentation
 
 ### Step 2: Update CI/CD (In Progress)
+
 - Create new workflow files
 - Update existing workflows for arm64
 - Test builds on self-hosted runner
 - Document runner setup requirements
 
 ### Step 3: Add RPi Image Builder (In Progress)
+
 - Create image build scripts
 - Test image generation
 - Automate in CI/CD
 - Document flashing process
 
 ### Step 4: Documentation (In Progress)
+
 - Update README.md
 - Create DEPLOYMENT.md
 - Update development.md
 - Add troubleshooting guides
 
 ### Step 5: Validation (Final)
+
 - Test .deb installation on clean RPi
 - Test RPi image flashing and boot
 - Verify all workflows execute successfully
@@ -321,16 +356,19 @@ jobs:
 ## Benefits of This Approach
 
 ### For Users
+
 - **Easier Updates**: Install .deb packages via apt or manual download
 - **Faster Setup**: Flash pre-built images for new installations
 - **Better Support**: Clearer separation of concerns
 
 ### For Developers
+
 - **Faster Builds**: Native ARM compilation without emulation
 - **Clearer Structure**: Defined boundaries between components
 - **Standard Tools**: Use Debian packaging and standard CI/CD
 
 ### For Maintenance
+
 - **Reproducible**: Standard Debian packaging practices
 - **Testable**: Separate testing of package vs image
 - **Scalable**: Ready for future repository split if needed
@@ -338,6 +376,7 @@ jobs:
 ## Dependencies and Interfaces
 
 ### Debian Package Dependencies (debian/control)
+
 ```
 Depends: python3 (>= 3.11),
          python3-tornado,
@@ -352,6 +391,7 @@ Recommends: python3-lgpio | python3-rpi.gpio
 ```
 
 ### Build Dependencies
+
 ```
 Build-Depends: debhelper (>= 12),
                nodejs (>= 18),
@@ -366,12 +406,14 @@ Build-Depends: debhelper (>= 12),
 ## Testing Strategy
 
 ### Package Testing
+
 1. Install .deb on clean RPi 3 → Verify operation
 2. Install .deb on clean RPi 5 → Verify operation
 3. Upgrade existing installation → Verify no breakage
 4. Uninstall package → Verify clean removal
 
 ### Image Testing
+
 1. Flash image to SD card
 2. Boot Raspberry Pi 3 → Verify operation
 3. Boot Raspberry Pi 5 → Verify operation
@@ -379,6 +421,7 @@ Build-Depends: debhelper (>= 12),
 5. Test web interface access
 
 ### CI/CD Testing
+
 1. Verify builds on self-hosted runner
 2. Test artifact uploads
 3. Test release creation
@@ -413,6 +456,7 @@ Build-Depends: debhelper (>= 12),
 ## Questions and Decisions
 
 ### Resolved
+
 - **Q**: Keep monorepo or split now?
   - **A**: Keep monorepo, add clear separation, document future split
 
@@ -420,6 +464,7 @@ Build-Depends: debhelper (>= 12),
   - **A**: Yes, maintain existing multi-platform support
 
 ### Open
+
 - Package name: `onefinity-firmware` or `bbctrl`?
 - Version scheme: Match package.json or independent?
 - Image distribution: GitHub releases or separate hosting?
