@@ -1,67 +1,49 @@
 # Raspberry Pi 5 Support
 
-## Overview
+## Supported platform
 
-This firmware supports Raspberry Pi 5 exclusively. Raspberry Pi 3 support has been removed to simplify the codebase and focus on the more capable Pi 5 hardware.
+OneFinity firmware supports Raspberry Pi 5 systems running a 64-bit Raspberry
+Pi OS Bookworm installation or later. The firmware package targets ARM64 and
+requires Python 3.11 or later. Raspberry Pi 5 is the only supported Raspberry
+Pi model.
 
-## GPIO Implementation
+## GPIO
 
-### Raspberry Pi 5
-- Uses `lgpio` Python library
-- Package: `python3-lgpio`
-- New GPIO chip interface (gpiochip4)
+The Pi 5 GPIO implementation uses the `lgpio` Python library from the
+`python3-lgpio` package and GPIO chip 4. The package setup installs this
+dependency. `libgpiod-tools` provides command-line diagnostics such as
+`gpiodetect` and `gpioinfo`.
 
-## GPIO Compatibility Layer
-
-A compatibility layer is implemented in `src/py/bbctrl/gpio_compat.py` that provides a unified GPIO interface. While it still supports fallback to RPi.GPIO for backward compatibility with existing code, the primary target is now lgpio for Raspberry Pi 5.
-
-### Usage
-
-Scripts import the compatibility layer for GPIO operations:
+The compatibility module at `src/py/bbctrl/gpio_compat.py` preserves the
+existing GPIO call interface and prefers `lgpio`. Its optional `RPi.GPIO`
+fallback does not make other Raspberry Pi models supported and is not a package
+dependency.
 
 ```python
 from bbctrl import gpio_compat as gpio
 
-gpio.setwarnings(False)
-gpio.setmode(gpio.BCM)
 gpio.setup(27, gpio.OUT)
 gpio.output(27, 1)
 ```
 
-The compatibility layer uses `lgpio` on Raspberry Pi 5.
+On the Pi 5, the module opens `gpiochip4` and uses `lgpio` for these operations.
 
-## Building Firmware
+## Build and test
 
-Build the firmware package for ARM64:
+Build the Debian package on an ARM64 system or use the project build workflow.
+Build tools require Node.js 22.22.2 or later and Python 3.11 or later.
 
 ```bash
-make pkg
+npm ci
+dpkg-buildpackage -us -uc -b
 ```
 
-## Installing on Raspberry Pi 5
+For development checks, see [docs/development.md](development.md). Deployment
+and SD card flashing instructions are in [DEPLOYMENT.md](../DEPLOYMENT.md).
 
-The setup script installs the required GPIO library:
-1. Installs `python3-lgpio` for Pi 5 GPIO support
-2. Configures GPIO settings for optimal CNC controller operation
+## Pi 5 hardware features
 
-## Key Implementation Files
-
-- `src/py/bbctrl/gpio_compat.py` - GPIO compatibility layer
-- `scripts/avr109-flash.py` - AVR flashing utility using GPIO
-- `scripts/setup_rpi.sh` - System setup script
-- `debian/control` - Package dependencies including python3-lgpio
-
-## Testing
-
-To test on Raspberry Pi 5:
-1. Build the firmware package
-2. Copy to Pi 5
-3. Run setup script
-4. Verify GPIO operations work correctly
-
-## Hardware Requirements
-
-- **Required**: Raspberry Pi 5 (ARM64)
-- **OS**: Raspberry Pi OS Bookworm (Debian 12) or later
-- **Python**: 3.11+
-- **GPIO Library**: python3-lgpio
+- 64-bit ARM64 package and Raspberry Pi OS image
+- `lgpio` access through GPIO chip 4
+- Bookworm boot configuration under `/boot/firmware`
+- I2C and SPI configuration performed by the Pi setup/image process

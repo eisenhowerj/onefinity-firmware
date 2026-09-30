@@ -8,7 +8,9 @@ OneFinity CNC Controller Firmware is a complete software solution for controllin
 
 - **Raspberry Pi 5** (64-bit ARM64)
 
-**Note:** Raspberry Pi 3 support has been removed in favor of focusing on the more capable Pi 5 hardware.
+The supported operating system is Raspberry Pi OS Bookworm (64-bit) or later.
+The Python backend requires Python 3.11 or later. Building the project requires
+Node.js 22.22.2 or later.
 
 ## Installation
 
@@ -54,18 +56,30 @@ See [DEPLOYMENT.md](DEPLOYMENT.md) for complete deployment documentation.
 See [docs/development.md](docs/development.md) for development setup and build instructions.
 
 Quick start for developers:
+
 ```bash
 # Clone repository
 git clone https://github.com/eisenhowerj/onefinity-firmware.git
 cd onefinity-firmware
 
-# Install dependencies
-npm install
-pip3 install tornado sockjs-tornado pyserial pyudev smbus2 watchdog
+# Install Python development dependencies in a virtual environment
+python3 -m venv .venv
+. .venv/bin/activate
+python -m pip install 'setuptools<81'
+python -m pip install -r requirements-dev.txt
+
+# Install JavaScript dependencies (also installs Svelte dependencies)
+npm ci
 
 # Build
 make all
 ```
+
+Run Python tests with `python -m pytest` and validate the Svelte components
+with `npm run check --prefix src/svelte-components`. `npm test` is the Vitest
+command, but the repository currently has no JavaScript test files. The GPIO
+Python tests require a Raspberry Pi 5 with `python3-lgpio` installed; see the
+development guide for details.
 
 ## Project Structure
 
@@ -90,12 +104,16 @@ onefinity-firmware/
 
 ### Debian Package
 
-The Svelte build requires Node.js 20.19+ or 22.12+.
+Building requires Node.js 22.22.2 or later and Python 3.11 or later.
+Make sure the installed Node.js version meets this minimum before building.
 
 ```bash
 # Install build dependencies
 sudo apt-get install -y build-essential gcc-avr avr-libc \
-    python3 python3-setuptools debhelper devscripts nodejs npm
+    python3 python3-setuptools debhelper devscripts npm
+
+# Verify Node.js meets the minimum version above
+node --version
 
 # Build package
 dpkg-buildpackage -us -uc -b
@@ -105,10 +123,11 @@ ls ../*.deb
 ```
 
 ### RPi SD Card Image
+
 ```bash
 # Build Debian package first (see above)
 
-# Build image for Pi 5
+# Build the Raspberry Pi 5 image
 .github/workflows/scripts/build-rpi-image.sh <version> <path-to-deb> pi5
 ```
 

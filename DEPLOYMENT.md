@@ -3,32 +3,39 @@
 ## Overview
 
 OneFinity firmware can be deployed in two ways:
+
 1. **Debian Package (.deb)**: Install or upgrade firmware on an existing Raspberry Pi system
 2. **SD Card Image (.img.xz)**: Flash a complete, ready-to-use system image for new installations
 
 ## Debian Package Deployment
 
 ### Prerequisites
-- Raspberry Pi 5
-- Raspberry Pi OS Bookworm (or compatible Debian-based system)
+
+- Raspberry Pi 5 (64-bit ARM64)
+- Raspberry Pi OS Bookworm (64-bit) or later
 - Network connectivity (for downloading dependencies)
+
+The firmware package requires Python 3.11 or later. Node.js 22.22.2 or later is
+required when building the package; it is not needed to install or run a release
+package.
 
 ### Installation
 
 1. **Download the Package**
-   
+
    Download the latest `.deb` package from the [releases page](https://github.com/eisenhowerj/onefinity-firmware/releases):
+
    ```bash
    wget https://github.com/eisenhowerj/onefinity-firmware/releases/download/vX.X.X/onefinity-firmware_X.X.X_arm64.deb
    ```
 
 2. **Install the Package**
-   
+
    ```bash
    sudo apt update
    sudo apt install ./onefinity-firmware_X.X.X_arm64.deb
    ```
-   
+
    This will:
    - Install all dependencies
    - Set up the OneFinity service
@@ -36,38 +43,43 @@ OneFinity firmware can be deployed in two ways:
    - Enable (but not start) the service
 
 3. **Configure the System**
-   
+
    For first-time installations, run the setup script:
+
    ```bash
    sudo /opt/onefinity/bin/setup-rpi.sh
    ```
-   
+
    This configures GPIO, I2C, boot settings, and other hardware-specific options.
 
 4. **Start the Service**
-   
+
    ```bash
    sudo systemctl start onefinity
    ```
 
 5. **Verify Installation**
-   
+
    Check service status:
+
    ```bash
    sudo systemctl status onefinity
    ```
-   
+
    Check logs:
+
    ```bash
    sudo journalctl -u onefinity -f
    ```
 
 6. **Access the Web Interface**
-   
+
    Open a browser and navigate to:
+
    ```
    http://onefinity.local
    ```
+
    Or use the IP address of your Raspberry Pi.
 
 ### Upgrading
@@ -75,25 +87,25 @@ OneFinity firmware can be deployed in two ways:
 To upgrade an existing installation:
 
 1. **Download the New Package**
-   
+
    ```bash
    wget https://github.com/eisenhowerj/onefinity-firmware/releases/download/vX.X.X/onefinity-firmware_X.X.X_arm64.deb
    ```
 
 2. **Stop the Service**
-   
+
    ```bash
    sudo systemctl stop onefinity
    ```
 
 3. **Install the Upgrade**
-   
+
    ```bash
    sudo apt install ./onefinity-firmware_X.X.X_arm64.deb
    ```
 
 4. **Restart the Service**
-   
+
    ```bash
    sudo systemctl start onefinity
    ```
@@ -115,6 +127,7 @@ sudo apt purge onefinity-firmware
 ## SD Card Image Deployment
 
 ### Prerequisites
+
 - Raspberry Pi 5
 - MicroSD card (8GB minimum, 16GB+ recommended)
 - SD card reader
@@ -122,40 +135,42 @@ sudo apt purge onefinity-firmware
 
 ### Available Images
 
-SD card image for Raspberry Pi 5:
-- **Pi 5 (arm64)**: `onefinity-X.X.X-rpi5-arm64.img.xz` - For Raspberry Pi 5
+The release image is built for Raspberry Pi 5 (arm64) and named
+`onefinity-<version>-rpi5-arm64.img.xz`. Replace `<version>` in the download
+commands below with the release tag (without its leading `v`).
 
 ### Flashing the Image
 
 #### On Linux
 
 1. **Download the Image**
-   
+
    ```bash
    wget https://github.com/eisenhowerj/onefinity-firmware/releases/download/vX.X.X/onefinity-X.X.X-rpi5-arm64.img.xz
    ```
 
 2. **Identify the SD Card Device**
-   
+
    Insert the SD card and identify the device:
+
    ```bash
    lsblk
    ```
-   
+
    Look for your SD card (e.g., `/dev/sdX` or `/dev/mmcblkX`).
-   
+
    **⚠️ WARNING**: Make sure you identify the correct device. Writing to the wrong device will destroy data!
 
 3. **Flash the Image**
-   
+
    ```bash
    xz -d -c onefinity-X.X.X-rpi5-arm64.img.xz | sudo dd of=/dev/sdX bs=4M status=progress conv=fsync
    ```
-   
+
    Replace `/dev/sdX` with your SD card device.
 
 4. **Sync and Eject**
-   
+
    ```bash
    sudo sync
    sudo eject /dev/sdX
@@ -164,36 +179,37 @@ SD card image for Raspberry Pi 5:
 #### On macOS
 
 1. **Download the Image**
-   
+
    Download from the releases page or use curl:
+
    ```bash
    curl -L -o onefinity.img.xz https://github.com/eisenhowerj/onefinity-firmware/releases/download/vX.X.X/onefinity-X.X.X-rpi5-arm64.img.xz
    ```
 
 2. **Identify the SD Card**
-   
+
    ```bash
    diskutil list
    ```
-   
+
    Look for your SD card (e.g., `/dev/diskX`).
 
 3. **Unmount the SD Card**
-   
+
    ```bash
    diskutil unmountDisk /dev/diskX
    ```
 
 4. **Flash the Image**
-   
+
    ```bash
    xz -d -c onefinity.img.xz | sudo dd of=/dev/rdiskX bs=4m
    ```
-   
+
    Note: Use `rdiskX` (raw disk) for faster writes.
 
 5. **Eject**
-   
+
    ```bash
    sudo diskutil eject /dev/diskX
    ```
@@ -203,61 +219,64 @@ SD card image for Raspberry Pi 5:
 Use **Raspberry Pi Imager** (recommended) or **balenaEtcher**:
 
 1. **Download and Install Raspberry Pi Imager**
-   
+
    Download from: https://www.raspberrypi.com/software/
 
 2. **Launch Raspberry Pi Imager**
 
 3. **Choose Custom Image**
-   
+
    - Click "CHOOSE OS"
    - Select "Use custom"
    - Browse to your downloaded `.img.xz` file
 
 4. **Choose SD Card**
-   
+
    - Click "CHOOSE STORAGE"
    - Select your SD card
 
 5. **Write**
-   
+
    - Click "WRITE"
    - Wait for completion
 
 ### First Boot
 
 1. **Insert the SD Card**
-   
+
    Insert the flashed SD card into your Raspberry Pi.
 
 2. **Connect Network**
-   
+
    Connect an Ethernet cable. (WiFi can be configured after first boot)
 
 3. **Power On**
-   
+
    Connect power to boot the Raspberry Pi.
 
 4. **Wait for Boot**
-   
+
    First boot may take 2-3 minutes while the system initializes.
 
 5. **Access the Interface**
-   
+
    Open a browser and navigate to:
+
    ```
    http://onefinity.local
    ```
-   
+
    Or find the IP address using your router's admin interface.
 
 ### Default Credentials
 
 **SSH Access:**
+
 - Username: `pi` (or `bbmc` depending on base image)
 - Password: `buildbotics` or `onefinity`
 
 **Web Interface:**
+
 - Default admin password: `onefinity`
 
 **⚠️ IMPORTANT**: Change the default passwords immediately after first login!
@@ -269,21 +288,23 @@ Use **Raspberry Pi Imager** (recommended) or **balenaEtcher**:
 #### WiFi Setup
 
 1. **Via SSH**
-   
+
    ```bash
    sudo /opt/onefinity/bin/config-wifi
    ```
-   
+
    Follow the prompts to configure WiFi.
 
 2. **Via Configuration File**
-   
+
    Edit `/etc/wpa_supplicant/wpa_supplicant.conf`:
+
    ```bash
    sudo nano /etc/wpa_supplicant/wpa_supplicant.conf
    ```
-   
+
    Add your network:
+
    ```
    network={
        ssid="YourNetworkName"
@@ -294,11 +315,13 @@ Use **Raspberry Pi Imager** (recommended) or **balenaEtcher**:
 #### Static IP Address
 
 Edit `/etc/dhcpcd.conf`:
+
 ```bash
 sudo nano /etc/dhcpcd.conf
 ```
 
 Add configuration for your interface:
+
 ```
 interface eth0
 static ip_address=192.168.1.100/24
@@ -307,6 +330,7 @@ static domain_name_servers=192.168.1.1 8.8.8.8
 ```
 
 Restart networking:
+
 ```bash
 sudo systemctl restart dhcpcd
 ```
@@ -337,11 +361,13 @@ sudo ufw enable
 ### Service Management
 
 **Check status:**
+
 ```bash
 sudo systemctl status onefinity
 ```
 
 **Start/Stop/Restart:**
+
 ```bash
 sudo systemctl start onefinity
 sudo systemctl stop onefinity
@@ -349,6 +375,7 @@ sudo systemctl restart onefinity
 ```
 
 **Enable/Disable auto-start:**
+
 ```bash
 sudo systemctl enable onefinity
 sudo systemctl disable onefinity
@@ -357,11 +384,13 @@ sudo systemctl disable onefinity
 ### Log Files
 
 **System logs:**
+
 ```bash
 sudo journalctl -u onefinity -f
 ```
 
 **Application logs:**
+
 ```bash
 sudo tail -f /var/log/onefinity/*.log
 ```
@@ -369,6 +398,7 @@ sudo tail -f /var/log/onefinity/*.log
 ### Backup and Restore
 
 **Backup configuration:**
+
 ```bash
 sudo tar -czf onefinity-backup-$(date +%Y%m%d).tar.gz \
     /var/lib/onefinity \
@@ -376,6 +406,7 @@ sudo tar -czf onefinity-backup-$(date +%Y%m%d).tar.gz \
 ```
 
 **Restore configuration:**
+
 ```bash
 sudo systemctl stop onefinity
 sudo tar -xzf onefinity-backup-YYYYMMDD.tar.gz -C /
@@ -387,28 +418,38 @@ sudo systemctl start onefinity
 ### Service Won't Start
 
 1. Check logs:
+
    ```bash
    sudo journalctl -u onefinity -n 50
    ```
 
 2. Verify dependencies:
+
    ```bash
    sudo apt install -f
    ```
 
 3. Check configuration:
+
    ```bash
    sudo /opt/onefinity/bin/edit-config
+   ```
+
+4. Confirm the system provides Python 3.11 or later:
+   ```bash
+   python3 --version
    ```
 
 ### Cannot Access Web Interface
 
 1. Verify service is running:
+
    ```bash
    sudo systemctl status onefinity
    ```
 
 2. Check network connectivity:
+
    ```bash
    ping onefinity.local
    ```
@@ -421,26 +462,38 @@ sudo systemctl start onefinity
 ### AVR Firmware Issues
 
 Reflash the AVR firmware:
+
 ```bash
 sudo /opt/onefinity/bin/avr109-flash.py /opt/onefinity/firmware/bbctrl-avr-firmware.hex
 ```
 
 ### GPIO Issues
 
-Ensure lgpio is installed:
+Raspberry Pi 5 uses `lgpio` and GPIO chip 4. Ensure the runtime packages are
+installed:
+
 ```bash
 sudo apt install python3-lgpio libgpiod-tools
+```
+
+Check that the GPIO chip is present:
+
+```bash
+gpiodetect
+gpioinfo gpiochip4
 ```
 
 ## Support
 
 For issues and questions:
+
 - GitHub Issues: https://github.com/eisenhowerj/onefinity-firmware/issues
 - Documentation: https://github.com/eisenhowerj/onefinity-firmware/tree/main/docs
 
 ## Version Information
 
 Check installed version:
+
 ```bash
 dpkg -l | grep onefinity-firmware
 ```
@@ -460,6 +513,7 @@ Or via the web interface: Settings → About
 ### Custom Service Configuration
 
 Edit the systemd service file:
+
 ```bash
 sudo systemctl edit onefinity
 ```
@@ -467,12 +521,14 @@ sudo systemctl edit onefinity
 ### Environment Variables
 
 Add environment variables in `/etc/systemd/system/onefinity.service.d/override.conf`:
+
 ```
 [Service]
 Environment="CUSTOM_VAR=value"
 ```
 
 Then reload:
+
 ```bash
 sudo systemctl daemon-reload
 sudo systemctl restart onefinity

@@ -1,5 +1,11 @@
 # OneFinity Firmware Modernization - Implementation Summary
 
+> **Historical implementation summary:** Some workflow, image, and hardware
+> details below describe an earlier state of the project. Current firmware
+> supports Raspberry Pi 5 (ARM64) only and requires Python 3.11+ and Node.js
+> 22.22.2+ to build. Use [DEPLOYMENT.md](DEPLOYMENT.md) and
+> [docs/development.md](docs/development.md) for current instructions.
+
 ## Overview
 
 This document summarizes the implementation of the modernization plan for the OneFinity firmware repository. The goal was to restructure the project for better maintainability, deployment, and CI/CD practices while maintaining the monorepo structure.
@@ -11,6 +17,7 @@ This document summarizes the implementation of the modernization plan for the On
 Created a complete Debian packaging system for the firmware:
 
 **Files Created:**
+
 - `debian/control` - Package metadata and dependencies
 - `debian/changelog` - Version history
 - `debian/compat` - Debhelper compatibility level
@@ -20,6 +27,7 @@ Created a complete Debian packaging system for the firmware:
 - `debian/prerm` - Pre-removal cleanup script
 
 **Package Details:**
+
 - **Package Name**: `onefinity-firmware`
 - **Architecture**: arm64
 - **Version**: 1.6.7 (from package.json)
@@ -27,6 +35,7 @@ Created a complete Debian packaging system for the firmware:
 - **Service Name**: `onefinity.service`
 
 **What Gets Packaged:**
+
 - Web frontend (HTTP files)
 - Python backend (bbctrl module)
 - AVR firmware
@@ -40,12 +49,14 @@ Created and updated workflows for automated builds on self-hosted ARM64 runners:
 #### New Workflows:
 
 **`build-debian-package.yml`**
+
 - Triggers: Push, PR, manual dispatch
 - Builds Debian package natively on ARM64
 - Uploads .deb artifact
 - No x86 emulation required
 
 **`build-rpi-image.yml`**
+
 - Triggers: Manual dispatch, version tags
 - Builds SD card images for both Pi 3 and Pi 5
 - Matrix build strategy for multiple architectures
@@ -55,10 +66,12 @@ Created and updated workflows for automated builds on self-hosted ARM64 runners:
 #### Updated Workflows:
 
 **`build-test.yml`**
+
 - Changed runner from `[self-hosted, ec2]` to `[self-hosted, linux, arm64]`
 - Standardized runner labels
 
 **`release.yml`**
+
 - Changed runner from `ubuntu-latest` to `[self-hosted, linux, arm64]`
 - Added Debian package build step
 - Now releases both .tar.bz2 and .deb packages
@@ -68,6 +81,7 @@ Created and updated workflows for automated builds on self-hosted ARM64 runners:
 Created automated SD card image building infrastructure:
 
 **Script Created:**
+
 - `.github/workflows/scripts/build-rpi-image.sh`
   - Downloads base Raspberry Pi OS images
   - Mounts and modifies image partitions
@@ -77,6 +91,7 @@ Created automated SD card image building infrastructure:
   - Supports both Pi 3 (armhf) and Pi 5 (arm64)
 
 **Image Variants:**
+
 - `onefinity-X.X.X-rpi3-armhf.img.xz` - For Raspberry Pi 3
 - `onefinity-X.X.X-rpi5-arm64.img.xz` - For Raspberry Pi 5
 
@@ -87,6 +102,7 @@ Created and updated documentation:
 #### New Documents:
 
 **`MODERNIZATION_PLAN.md`**
+
 - Complete architectural overview
 - Detailed component breakdown
 - CI/CD strategy
@@ -94,6 +110,7 @@ Created and updated documentation:
 - Migration path and timeline
 
 **`DEPLOYMENT.md`**
+
 - Installation instructions for Debian packages
 - SD card image flashing guide
 - Post-deployment configuration
@@ -102,6 +119,7 @@ Created and updated documentation:
 - Maintenance and monitoring
 
 **`IMPLEMENTATION_SUMMARY.md`** (this document)
+
 - Summary of completed work
 - Technical details of implementation
 - Testing recommendations
@@ -109,6 +127,7 @@ Created and updated documentation:
 #### Updated Documents:
 
 **`README.md`**
+
 - Quick start guide
 - Installation options (package vs image)
 - Project structure overview
@@ -116,6 +135,7 @@ Created and updated documentation:
 - Contributing guidelines
 
 **`docs/development.md`**
+
 - Updated for new build system
 - Local development vs CI/CD builds
 - Workflow triggering instructions
@@ -238,6 +258,7 @@ onefinity-firmware/
 ## Workflow Behavior
 
 ### On Push to main/develop/master:
+
 1. `build-test.yml` runs
    - Builds project with make
    - Creates legacy .tar.bz2 package
@@ -248,10 +269,12 @@ onefinity-firmware/
    - Uploads .deb artifact
 
 ### On Manual Workflow Dispatch:
+
 - Any workflow can be manually triggered
 - `build-rpi-image.yml` can be run with specific Pi model
 
 ### On Version Tag (v*):
+
 1. `release.yml` runs
    - Builds all components
    - Creates Debian package
@@ -265,6 +288,7 @@ onefinity-firmware/
 ## Benefits Achieved
 
 ### For Users:
+
 - ✅ Easy installation via Debian package
 - ✅ One-command upgrades (`apt upgrade`)
 - ✅ Turnkey SD card images for new setups
@@ -272,6 +296,7 @@ onefinity-firmware/
 - ✅ Comprehensive documentation
 
 ### For Developers:
+
 - ✅ Clear separation of concerns
 - ✅ Faster native ARM builds (no QEMU)
 - ✅ Standard Debian packaging practices
@@ -279,6 +304,7 @@ onefinity-firmware/
 - ✅ Consistent build environment
 
 ### For Maintenance:
+
 - ✅ Reproducible builds
 - ✅ Version-controlled packaging metadata
 - ✅ Automated release process
@@ -290,6 +316,7 @@ onefinity-firmware/
 ### Package Installation Testing
 
 **On Raspberry Pi 3:**
+
 ```bash
 # Test fresh installation
 sudo apt install ./onefinity-firmware_1.6.7_arm64.deb
@@ -306,6 +333,7 @@ sudo apt remove onefinity-firmware
 ```
 
 **On Raspberry Pi 5:**
+
 ```bash
 # Same tests as Pi 3
 # Additional: Verify lgpio library usage
@@ -315,6 +343,7 @@ sudo apt remove onefinity-firmware
 ### Image Testing
 
 **Pi 3 Image:**
+
 ```bash
 # Flash image to SD card
 xz -d onefinity-1.6.7-rpi3-armhf.img.xz
@@ -328,6 +357,7 @@ sudo dd if=onefinity-1.6.7-rpi3-armhf.img of=/dev/sdX bs=4M status=progress
 ```
 
 **Pi 5 Image:**
+
 ```bash
 # Flash image (same process)
 # Boot Raspberry Pi 5
@@ -343,6 +373,7 @@ sudo dd if=onefinity-1.6.7-rpi3-armhf.img of=/dev/sdX bs=4M status=progress
    - Verify: Artifacts are uploaded
 
 2. **Create version tag**
+
    ```bash
    git tag v1.6.8-test
    git push origin v1.6.8-test
@@ -438,10 +469,12 @@ sudo dd if=onefinity-1.6.7-rpi3-armhf.img of=/dev/sdX bs=4M status=progress
 If issues arise, the legacy system remains functional:
 
 1. **Legacy Builds Still Work**:
+
    ```bash
    make all
    make pkg
    ```
+
    This creates the traditional .tar.bz2 package
 
 2. **Legacy Workflows**:
@@ -456,6 +489,7 @@ If issues arise, the legacy system remains functional:
 ## Success Metrics
 
 Measure success by:
+
 - ✅ Debian package builds successfully on ARM64 runner
 - ✅ SD card images boot and run firmware correctly
 - ✅ All workflows execute without errors
