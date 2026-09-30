@@ -1,0 +1,16 @@
+node_modules/
+build/
+dist/
+coverage/
+package-lock.json
+src/svelte-components/package-lock.json
+src/svelte-components/.svelte-kit/
+src/svelte-components/dist/
+src/static/js/clusterize.min.js
+src/static/js/jquery-1.11.3.min.js
+src/static/js/socket.io.js
+src/static/js/sockjs.min.js
+src/static/js/three.min.js
+src/static/js/vue.js
+src/static/css/font-awesome.min.css
+src/static/css/pure-min.css
